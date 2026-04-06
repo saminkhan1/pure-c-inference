@@ -10,6 +10,7 @@ To ensure legibility with Voxtral Realtime reporting and to capture dictation UX
 |---|---|---|
 | **Reference Parity** | Verify baseline correctness against trusted runs. | Token/logit agreement, transcript agreement, crash-free decoding rate. |
 | **Standard ASR** | Maintain quality floor on industry datasets. | WER/CER on LibriSpeech, GigaSpeech, VoxPopuli, Common Voice (short/long/multilingual splits). |
+| **Dictation ASR**| Dictation-grade micro-evals with casing and punctuation intact. | Case/Punctuation-sensitive WER/CER on `dictation_micro`. |
 | **Realtime Systems** | Quantify streaming and throughput efficiency. | Time-to-first-token (TTFT), median/p95 token latency, finalization latency, real-time factor (RTF), memory usage, CPU/GPU utilization, multi-stream throughput (1-16 streams). |
 | **Dictation UX** | Measure the perceived feel of live typing on Mac. | Partial stability, backtrack rate, commit latency, endpoint latency (after speech stop), punctuation lag, correction burden. |
 
@@ -42,6 +43,7 @@ Every run emits one JSON row per utterance and a summary per suite.
   "observed_latency_ms": 492,
   "time_to_first_token_ms": 120,
   "time_to_final_ms": 850,
+  "endpoint_latency_ms": 100,
   "prefix_churn_rate": 0.05,
   "transcript": "hello world",
   "reference_text": "Hello world.",
@@ -74,7 +76,7 @@ Execute the first autoresearch campaign in the following order:
 
 | Priority | Focus Area | Goal |
 |---|---|---|
-| **1** | **Eval Harness** | Build the frozen harness (TTFT, time-to-stable-prefix, finalization latency, memory, crashes at 240/480/960ms delays). |
+| **1** | **Eval Harness** | Build the frozen harness (TTFT, time-to-stable-prefix, finalization latency, memory, crashes at 240/480/960ms delays). Introduce `dictation_micro` with case/punctuation sensitivity and `endpoint_latency_ms`. |
 | **2** | **Decoder & GPU Scheduling** | Optimize the monolithic GPU decoder path (KV cache, attention on GPU) for wall-clock wins. |
 | **3** | **Chunk / Commit Policies** | Tune incremental audio ingestion, chunk sizes, and commit events to improve perceived dictation responsiveness. |
 | **4** | **Cross-stage Fusion** | Explore broader code edits (cross-stage fusion, deep memory refactors) safely once the pipeline boundaries are optimized. |

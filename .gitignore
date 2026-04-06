@@ -4,3 +4,17 @@ voxtral-model/
 pyenv*/
 misc/
 *.o
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Benchmark outputs and temporary files
+bench/
+eval_output.txt
+
+# Generated audio samples for benchmarking
+samples/benchmark/librispeech/
+samples/benchmark/autoresearch/*/
+!samples/benchmark/autoresearch/*.json
