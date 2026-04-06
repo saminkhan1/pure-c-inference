@@ -8,6 +8,10 @@
 #include "voxtral_kernels.h"
 #include "voxtral_audio.h"
 #include "voxtral_mic.h"
+#ifdef WEXPROFLOW
+#include "voxtral_hotkey.h"
+#include "voxtral_paste.h"
+#endif
 #ifdef USE_METAL
 #include "voxtral_metal.h"
 #endif
@@ -17,12 +21,28 @@
 #include <signal.h>
 #include <unistd.h>
 #include <math.h>
+#include <pthread.h>
+#include <sys/time.h>
 
 #define DEFAULT_FEED_CHUNK 16000 /* 1 second at 16kHz */
 
-/* SIGINT handler for clean exit from --from-mic */
+/* SIGINT handler for clean exit */
 static volatile sig_atomic_t mic_interrupted = 0;
 static void sigint_handler(int sig) { (void)sig; mic_interrupted = 1; }
+
+/* ---- wexproflow state ---- */
+#ifdef WEXPROFLOW
+static volatile int wf_event = 0; /* 0=none, 1=toggle, 2=cancel */
+static pthread_mutex_t wf_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  wf_cond  = PTHREAD_COND_INITIALIZER;
+
+static void wexproflow_hotkey_cb(vox_hotkey_event_t event) {
+    pthread_mutex_lock(&wf_mutex);
+    wf_event = (event == VOX_HOTKEY_TOGGLE) ? 1 : 2;
+    pthread_cond_signal(&wf_cond);
+    pthread_mutex_unlock(&wf_mutex);
+}
+#endif /* WEXPROFLOW */
 
 static void usage(const char *prog) {
     fprintf(stderr, "voxtral.c — Voxtral Realtime 4B speech-to-text\n\n");
@@ -32,6 +52,7 @@ static void usage(const char *prog) {
     fprintf(stderr, "  -i <file>     Input WAV file (16-bit PCM, any sample rate)\n");
     fprintf(stderr, "  --stdin       Read audio from stdin (auto-detect WAV or raw s16le 16kHz mono)\n");
     fprintf(stderr, "  --from-mic    Capture from default microphone (macOS only, Ctrl+C to stop)\n");
+    fprintf(stderr, "  --wexproflow  Hotkey dictation mode: Option+Space to record, paste on silence\n");
     fprintf(stderr, "\nOptions:\n");
     fprintf(stderr, "  -I <secs>     Encoder processing interval in seconds (default: 2.0)\n");
     fprintf(stderr, "  --alt <c>     Show alternative tokens within cutoff distance (0.0-1.0)\n");
@@ -123,6 +144,7 @@ int main(int argc, char **argv) {
     int verbosity = 1; /* 0=silent, 1=normal, 2=debug */
     int use_stdin = 0;
     int use_mic = 0;
+    int use_wexproflow = 0;
     float interval = -1.0f; /* <0 means use default */
 
     for (int i = 1; i < argc; i++) {
@@ -146,6 +168,8 @@ int main(int argc, char **argv) {
             use_stdin = 1;
         } else if (strcmp(argv[i], "--from-mic") == 0) {
             use_mic = 1;
+        } else if (strcmp(argv[i], "--wexproflow") == 0) {
+            use_wexproflow = 1;
         } else if (strcmp(argv[i], "--monitor") == 0) {
             extern int vox_monitor;
             vox_monitor = 1;
@@ -163,12 +187,12 @@ int main(int argc, char **argv) {
         }
     }
 
-    if (!model_dir || (!input_wav && !use_stdin && !use_mic)) {
+    if (!model_dir || (!input_wav && !use_stdin && !use_mic && !use_wexproflow)) {
         usage(argv[0]);
         return 1;
     }
-    if ((input_wav ? 1 : 0) + use_stdin + use_mic > 1) {
-        fprintf(stderr, "Error: -i, --stdin, and --from-mic are mutually exclusive\n");
+    if ((input_wav ? 1 : 0) + use_stdin + use_mic + use_wexproflow > 1) {
+        fprintf(stderr, "Error: -i, --stdin, --from-mic, and --wexproflow are mutually exclusive\n");
         return 1;
     }
 
@@ -184,6 +208,217 @@ int main(int argc, char **argv) {
     if (!ctx) {
         fprintf(stderr, "Failed to load model from %s\n", model_dir);
         return 1;
+    }
+
+    /* ---- wexproflow mode ---- */
+    if (use_wexproflow) {
+#ifndef WEXPROFLOW
+        fprintf(stderr, "Error: --wexproflow requires building with 'make wexproflow'\n");
+#ifdef USE_METAL
+        vox_metal_shutdown();
+#endif
+        vox_free(ctx);
+        return 1;
+#else
+        /* Check Accessibility permission (needed for Cmd+V injection) */
+        if (!vox_paste_check_access()) {
+            vox_free(ctx);
+            return 1;
+        }
+
+        /* Install SIGINT/SIGTERM handler before starting hotkey thread */
+        struct sigaction sa;
+        sa.sa_handler = sigint_handler;
+        sa.sa_flags = 0;
+        sigemptyset(&sa.sa_mask);
+        sigaction(SIGINT, &sa, NULL);
+        sigaction(SIGTERM, &sa, NULL);
+
+        /* Start global hotkey listener */
+        if (vox_hotkey_start(wexproflow_hotkey_cb) != 0) {
+            vox_free(ctx);
+            return 1;
+        }
+
+        fprintf(stderr, "wexproflow ready. Option+Space to record, Escape to cancel. Ctrl+C to quit.\n");
+
+        #define WF_SILENCE_THRESH  0.01f   /* RMS threshold (~-40 dBFS) */
+        #define WF_WINDOW          160     /* 10ms at 16kHz */
+        #define WF_SILENCE_PASS    60      /* 600ms pass-through (natural pauses) */
+        #define WF_AUTO_STOP_MS    2000.0  /* 2.0s wall-clock silence → auto-stop */
+
+        enum { WF_IDLE, WF_RECORDING } wf_state = WF_IDLE;
+        vox_stream_t *wf_stream = NULL;
+        int wf_first_token = 1;
+        int wf_silence_count = 0;
+        int wf_was_skipping = 0;
+        int wf_heard_speech = 0;
+        struct timeval wf_last_speech_tv;
+
+        /* Drain tokens from stream and type them into the frontmost app */
+        #define wf_drain_tokens() do { \
+            const char *_toks[64]; \
+            int _n; \
+            while ((_n = vox_stream_get(wf_stream, _toks, 64)) > 0) { \
+                for (int _i = 0; _i < _n; _i++) { \
+                    const char *_t = _toks[_i]; \
+                    if (wf_first_token) { \
+                        while (*_t == ' ') _t++; \
+                        if (*_t) wf_first_token = 0; \
+                    } \
+                    if (*_t) vox_type_text(_t); \
+                } \
+            } \
+        } while (0)
+
+        while (!mic_interrupted) {
+            if (wf_state == WF_IDLE) {
+                /* Block until hotkey event or SIGINT */
+                pthread_mutex_lock(&wf_mutex);
+                while (wf_event == 0 && !mic_interrupted)
+                    pthread_cond_wait(&wf_cond, &wf_mutex);
+                int ev = wf_event;
+                wf_event = 0;
+                pthread_mutex_unlock(&wf_mutex);
+
+                if (mic_interrupted) break;
+                if (ev != 1) continue; /* ignore cancel/escape when idle */
+
+                /* Start mic + streaming transcription */
+                if (vox_mic_start() != 0) {
+                    fprintf(stderr, "Error: Failed to start microphone\n");
+                    continue;
+                }
+                wf_stream = vox_stream_init(ctx);
+                if (!wf_stream) {
+                    fprintf(stderr, "Error: Failed to init stream\n");
+                    vox_mic_stop();
+                    continue;
+                }
+                vox_stream_set_continuous(wf_stream, 1);
+                if (interval > 0)
+                    vox_set_processing_interval(wf_stream, interval);
+                wf_first_token = 1;
+                wf_silence_count = 0;
+                wf_was_skipping = 0;
+                wf_heard_speech = 0;
+                gettimeofday(&wf_last_speech_tv, NULL);
+                wf_state = WF_RECORDING;
+                vox_hotkey_set_recording(1);
+                fprintf(stderr, "Recording...\n");
+                continue;
+            }
+
+            /* WF_RECORDING: poll for hotkey events + read mic + type tokens */
+            int ev = 0;
+            pthread_mutex_lock(&wf_mutex);
+            ev = wf_event;
+            wf_event = 0;
+            pthread_mutex_unlock(&wf_mutex);
+
+            if (ev == 2) {
+                /* Escape: cancel — stop without flushing */
+                vox_mic_stop();
+                vox_stream_free(wf_stream);
+                wf_stream = NULL;
+                wf_state = WF_IDLE;
+                vox_hotkey_set_recording(0);
+                fprintf(stderr, "\nCancelled.\n");
+                continue;
+            }
+
+            if (ev == 1) {
+                /* Option+Space again: stop recording, flush remaining tokens */
+                vox_mic_stop();
+                vox_stream_finish(wf_stream);
+                wf_drain_tokens();
+                vox_stream_free(wf_stream);
+                wf_stream = NULL;
+                wf_state = WF_IDLE;
+                vox_hotkey_set_recording(0);
+                fprintf(stderr, "\nDone.\n");
+                continue;
+            }
+
+            /* Read mic samples */
+            float mic_buf[4800]; /* 300ms max read */
+            int n = vox_mic_read(mic_buf, 4800);
+            if (n == 0) {
+                usleep(10000); /* 10ms idle */
+                continue;
+            }
+
+            /* Silence detection in 10ms windows — same logic as --from-mic.
+             * Voice + short pauses are fed to the stream; extended silence
+             * is skipped (flushed) to avoid wasting encoder/decoder time. */
+            int off = 0;
+            while (off + WF_WINDOW <= n) {
+                float energy = 0;
+                for (int i = 0; i < WF_WINDOW; i++) {
+                    float v = mic_buf[off + i];
+                    energy += v * v;
+                }
+                float rms = sqrtf(energy / WF_WINDOW);
+
+                if (rms > WF_SILENCE_THRESH) {
+                    if (wf_was_skipping)
+                        wf_was_skipping = 0;
+                    wf_heard_speech = 1;
+                    gettimeofday(&wf_last_speech_tv, NULL);
+                    vox_stream_feed(wf_stream, mic_buf + off, WF_WINDOW);
+                    wf_silence_count = 0;
+                } else {
+                    wf_silence_count++;
+                    if (wf_silence_count <= WF_SILENCE_PASS) {
+                        vox_stream_feed(wf_stream, mic_buf + off, WF_WINDOW);
+                    } else if (!wf_was_skipping) {
+                        wf_was_skipping = 1;
+                        vox_stream_flush(wf_stream);
+                    }
+                }
+                off += WF_WINDOW;
+            }
+            /* Feed any remaining samples (< 1 window) */
+            if (off < n)
+                vox_stream_feed(wf_stream, mic_buf + off, n - off);
+
+            /* Auto-stop: 2s wall-clock since last speech → finish and paste.
+             * Wall-clock is immune to flush blocking (~11s) and ambient noise
+             * spikes that would reset a sample counter. */
+            struct timeval wf_now;
+            gettimeofday(&wf_now, NULL);
+            double wf_silent_ms = (wf_now.tv_sec  - wf_last_speech_tv.tv_sec)  * 1000.0 +
+                                  (wf_now.tv_usec - wf_last_speech_tv.tv_usec) / 1000.0;
+            if (wf_heard_speech && wf_silent_ms > WF_AUTO_STOP_MS) {
+                vox_mic_stop();
+                vox_stream_finish(wf_stream);
+                wf_drain_tokens();
+                vox_stream_free(wf_stream);
+                wf_stream = NULL;
+                wf_state = WF_IDLE;
+                vox_hotkey_set_recording(0);
+                wf_heard_speech = 0;
+                fprintf(stderr, "\nDone.\n");
+                continue;
+            }
+
+            /* Type out any new tokens */
+            wf_drain_tokens();
+        }
+
+        /* Cleanup */
+        if (wf_stream) {
+            if (wf_state == WF_RECORDING) vox_mic_stop();
+            vox_hotkey_set_recording(0);
+            vox_stream_free(wf_stream);
+        }
+        vox_hotkey_stop();
+        vox_free(ctx);
+#ifdef USE_METAL
+        vox_metal_shutdown();
+#endif
+        return 0;
+#endif /* WEXPROFLOW */
     }
 
     vox_stream_t *s = vox_stream_init(ctx);

@@ -1339,7 +1339,15 @@ char *vox_transcribe_audio(vox_ctx_t *ctx, const float *samples, int n_samples) 
     vox_stream_t *s = vox_stream_init(ctx);
     if (!s) return NULL;
 
-    vox_stream_feed(s, samples, n_samples);
+    /* Feed in chunks so the encoder processes manageable batches and its
+     * rolling KV cache compaction works correctly for long audio. */
+    int off = 0;
+    while (off < n_samples) {
+        int chunk = n_samples - off;
+        if (chunk > VOX_SAMPLE_RATE) chunk = VOX_SAMPLE_RATE; /* 1s chunks */
+        vox_stream_feed(s, samples + off, chunk);
+        off += chunk;
+    }
     vox_stream_finish(s);
 
     /* Collect all tokens into a string */

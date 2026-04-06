@@ -18,7 +18,7 @@ TARGET = voxtral
 # Debug build flags
 DEBUG_CFLAGS = -Wall -Wextra -g -O0 -DDEBUG -fsanitize=address
 
-.PHONY: all clean debug info help blas mps inspect test
+.PHONY: all clean debug info help blas mps wexproflow inspect test
 
 # Default: show available targets
 all: help
@@ -31,6 +31,7 @@ help:
 ifeq ($(UNAME_S),Darwin)
 ifeq ($(UNAME_M),arm64)
 	@echo "  make mps      - Apple Silicon with Metal GPU (fastest)"
+	@echo "  make wexproflow - MPS + hotkey dictation mode (Option+Space → paste)"
 endif
 endif
 	@echo ""
@@ -84,14 +85,31 @@ voxtral_shaders_source.h: voxtral_shaders.metal
 voxtral_metal.o: voxtral_metal.m voxtral_metal.h voxtral_shaders_source.h
 	$(CC) $(MPS_OBJCFLAGS) -c -o $@ $<
 
+# =============================================================================
+# Target: wexproflow (MPS + hotkey dictation mode)
+# =============================================================================
+WEXPROFLOW_SRCS = voxtral_hotkey_macos.c voxtral_paste_macos.c
+WEXPROFLOW_CFLAGS = $(MPS_CFLAGS) -DWEXPROFLOW
+WEXPROFLOW_LDFLAGS = -framework CoreGraphics -framework ApplicationServices
+
+wexproflow: clean wexproflow-build
+	@echo ""
+	@echo "Built with MPS backend + wexproflow mode"
+
+main.wexproflow.o: main.c voxtral.h voxtral_kernels.h voxtral_mic.h voxtral_hotkey.h voxtral_paste.h
+	$(CC) $(WEXPROFLOW_CFLAGS) -c -o $@ $<
+
+wexproflow-build: $(SRCS:.c=.mps.o) $(WEXPROFLOW_SRCS:.c=.mps.o) voxtral_metal.o main.wexproflow.o
+	$(CC) $(WEXPROFLOW_CFLAGS) -o $(TARGET) $^ $(MPS_LDFLAGS) $(WEXPROFLOW_LDFLAGS)
+
 else
-mps:
-	@echo "Error: MPS backend requires Apple Silicon (arm64)"
+mps wexproflow:
+	@echo "Error: MPS/wexproflow requires Apple Silicon (arm64)"
 	@exit 1
 endif
 else
-mps:
-	@echo "Error: MPS backend requires macOS"
+mps wexproflow:
+	@echo "Error: MPS/wexproflow requires macOS"
 	@exit 1
 endif
 
@@ -126,7 +144,7 @@ test:
 # Utilities
 # =============================================================================
 clean:
-	rm -f $(OBJS) *.mps.o voxtral_metal.o main.o inspect_weights.o $(TARGET) inspect_weights
+	rm -f $(OBJS) *.mps.o *.wexproflow.o voxtral_metal.o main.o inspect_weights.o $(TARGET) inspect_weights
 	rm -f voxtral_shaders_source.h
 
 info:
@@ -155,4 +173,6 @@ voxtral_tokenizer.o: voxtral_tokenizer.c voxtral_tokenizer.h
 voxtral_safetensors.o: voxtral_safetensors.c voxtral_safetensors.h
 main.o: main.c voxtral.h voxtral_kernels.h voxtral_mic.h
 voxtral_mic_macos.o: voxtral_mic_macos.c voxtral_mic.h
+voxtral_hotkey_macos.o: voxtral_hotkey_macos.c voxtral_hotkey.h
+voxtral_paste_macos.o: voxtral_paste_macos.c voxtral_paste.h
 inspect_weights.o: inspect_weights.c voxtral_safetensors.h
