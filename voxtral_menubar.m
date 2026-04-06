@@ -37,6 +37,9 @@ extern pthread_cond_t  wf_cond;
     self.idleImage = [self drawMicIcon:NO];
     self.recordImage = [self drawMicIcon:YES];
     self.statusItem.button.image = self.idleImage;
+    self.statusItem.button.accessibilityLabel = @"Voxtral Dictation";
+    self.statusItem.button.accessibilityHelp = @"Press Option+Space to start dictation";
+    self.statusItem.button.toolTip = @"Voxtral Dictation - Idle";
 
     /* Menu */
     NSMenu *menu = [[NSMenu alloc] init];
@@ -50,11 +53,11 @@ extern pthread_cond_t  wf_cond;
 }
 
 - (NSImage *)drawMicIcon:(BOOL)filled {
-    NSImage *img = [[NSImage alloc] initWithSize:NSMakeSize(18, 18)];
+    NSImage *img = [[NSImage alloc] initWithSize:NSMakeSize(16, 16)];
     [img lockFocus];
 
     NSBezierPath *body = [NSBezierPath bezierPathWithRoundedRect:
-        NSMakeRect(6, 6, 6, 9) xRadius:3 yRadius:3];
+        NSMakeRect(5.5, 5, 5, 7) xRadius:2.5 yRadius:2.5];
     if (filled) {
         [[NSColor labelColor] setFill];
         [body fill];
@@ -64,22 +67,20 @@ extern pthread_cond_t  wf_cond;
         [body stroke];
     }
 
-    /* Stand */
     NSBezierPath *stand = [NSBezierPath bezierPath];
-    [stand moveToPoint:NSMakePoint(4, 10)];
-    [stand curveToPoint:NSMakePoint(14, 10)
-          controlPoint1:NSMakePoint(4, 3)
-          controlPoint2:NSMakePoint(14, 3)];
+    [stand moveToPoint:NSMakePoint(3.5, 8)];
+    [stand curveToPoint:NSMakePoint(12.5, 8)
+          controlPoint1:NSMakePoint(3.5, 2.5)
+          controlPoint2:NSMakePoint(12.5, 2.5)];
     [[NSColor labelColor] setStroke];
     [stand setLineWidth:1.2];
     [stand stroke];
 
-    /* Base line */
     NSBezierPath *base = [NSBezierPath bezierPath];
-    [base moveToPoint:NSMakePoint(9, 3)];
-    [base lineToPoint:NSMakePoint(9, 1)];
-    [base moveToPoint:NSMakePoint(6, 1)];
-    [base lineToPoint:NSMakePoint(12, 1)];
+    [base moveToPoint:NSMakePoint(8, 2.5)];
+    [base lineToPoint:NSMakePoint(8, 1)];
+    [base moveToPoint:NSMakePoint(5.5, 1)];
+    [base lineToPoint:NSMakePoint(10.5, 1)];
     [base setLineWidth:1.2];
     [base stroke];
 
@@ -143,6 +144,8 @@ void vox_menubar_set_recording(int active) {
     dispatch_async(dispatch_get_main_queue(), ^{
         g_delegate.statusItem.button.image =
             active ? g_delegate.recordImage : g_delegate.idleImage;
+        g_delegate.statusItem.button.toolTip =
+            active ? @"Voxtral Dictation - Recording..." : @"Voxtral Dictation - Idle";
     });
 }
 
