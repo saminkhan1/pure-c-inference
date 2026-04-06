@@ -21,7 +21,7 @@ static CFMachPortRef    event_tap;
 static CFRunLoopRef     tap_runloop;
 static CFRunLoopSourceRef tap_source;
 static pthread_t        tap_thread;
-static volatile int     hotkey_recording_active = 0;
+static int              hotkey_recording_active = 0;
 
 /* Synchronization for startup handshake */
 static pthread_mutex_t  tap_init_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -38,7 +38,7 @@ static CGEventRef tap_callback(CGEventTapProxy proxy, CGEventType type,
         return event;
     }
 
-    if (type != kCGEventKeyDown)
+    if (!event || type != kCGEventKeyDown)
         return event;
 
     CGKeyCode keycode = (CGKeyCode)CGEventGetIntegerValueField(
@@ -53,7 +53,8 @@ static CGEventRef tap_callback(CGEventTapProxy proxy, CGEventType type,
     }
 
     /* Escape → cancel (only swallow when recording is active) */
-    if (keycode == KEYCODE_ESCAPE && hotkey_recording_active) {
+    if (keycode == KEYCODE_ESCAPE &&
+        __atomic_load_n(&hotkey_recording_active, __ATOMIC_SEQ_CST)) {
         if (user_cb) user_cb(VOX_HOTKEY_CANCEL);
         return NULL;
     }
@@ -144,7 +145,7 @@ void vox_hotkey_stop(void) {
 }
 
 void vox_hotkey_set_recording(int active) {
-    hotkey_recording_active = active;
+    __atomic_store_n(&hotkey_recording_active, active, __ATOMIC_SEQ_CST);
 }
 
 #else /* !__APPLE__ */

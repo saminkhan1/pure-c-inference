@@ -94,6 +94,21 @@ run_test() {
     check_output "$name" "$got"
 }
 
+# Test 0: Mic start/stop cycle (no model needed, catches AudioQueue re-use hang)
+echo "=== Test: mic start/stop cycle ==="
+if [ -x "./test_mic_cycle" ]; then
+    if ./test_mic_cycle 2>/dev/null; then
+        echo "PASS: mic start/stop cycle"
+        PASS=$((PASS + 1))
+    else
+        echo "FAIL: mic start/stop cycle"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "SKIP: test_mic_cycle not built (run 'make test-mic' first)"
+fi
+echo ""
+
 # Test 1: Batch mode (whole file at once)
 run_test "batch" $VOXTRAL -d "$MODEL_DIR" -i "$TMPWAV"
 

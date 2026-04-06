@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.voxtral.agent</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__VOXTRAL_BIN__</string>
+        <string>--dictate</string>
+        <string>-d</string>
+        <string>__MODEL_DIR__</string>
+    </array>
+
+    <!-- Keep alive: launchd restarts on crash or SIGKILL -->
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Start immediately on login -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Log to ~/.config/voxtral/voxtral.log -->
+    <key>StandardErrorPath</key>
+    <string>__HOME__/.config/voxtral/voxtral.log</string>
+
+    <!-- Throttle restart: 10s between crash-restart cycles -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+</dict>
+</plist>

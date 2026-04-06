@@ -16,7 +16,8 @@ Audio processing uses a chunked encoder with overlapping windows, bounding memor
 
 ```bash
 # Build (choose your backend)
-make mps       # Apple Silicon (fastest)
+make mps           # Apple Silicon (fastest)
+make wexproflow    # Apple Silicon + Option+Space dictation mode
 # or: make blas    # Intel Mac / Linux with OpenBLAS
 
 # Download the model (~8.9GB)
@@ -58,6 +59,7 @@ This requires just PyTorch and a few standard libraries.
 - **Streaming C API**: Feed audio incrementally, get token strings back as they become available.
 - **Memory-mapped weights**: BF16 weights are mmap'd directly from safetensors, loading is near-instant.
 - **Live microphone input**: `--from-mic` captures and transcribes from the default microphone (macOS) with automatic silence detection.
+- **Dictation mode**: `--dictate` (Apple Silicon, `make wexproflow`) runs as a background service with a menu bar icon. Option+Space to record anywhere, auto-pastes on silence.
 - **WAV input**: Supports 16-bit PCM WAV files at any sample rate (auto-resampled to 16kHz).
 - **Chunked encoder**: Processes audio in overlapping chunks, bounding memory regardless of length.
 - **Rolling KV cache**: Decoder KV cache is automatically compacted when it exceeds the sliding window (8192 positions), capping memory usage and allowing unlimited-length audio.
@@ -169,6 +171,100 @@ To convert files to WAV format, just use `ffmpeg`:
 
 The above command line works for many file types, not just for OGG files, of course.
 There are two example wave files under the `samples` directory.
+
+### Dictation Mode (`--dictate`)
+
+Dictation mode turns voxtral into a system-wide background transcription service. Press **Option+Space** anywhere to start recording, pause speaking and it auto-stops, and your transcribed text is pasted directly into the focused application. A menu bar icon shows the current state.
+
+**Requires Apple Silicon (Metal GPU).** Dictation mode is only available in the `wexproflow` build.
+
+#### Quickstart
+
+```bash
+# 1. Download model weights (~8.9GB)
+./download_model.sh
+
+# 2. Build with dictation support
+make wexproflow
+
+# 3. Grant permissions when prompted (one-time):
+#    System Settings → Privacy & Security → Accessibility → enable voxtral/terminal
+#    System Settings → Privacy & Security → Input Monitoring → enable voxtral/terminal
+
+# 4. Run as a foreground service
+./voxtral -d voxtral-model --dictate
+
+# 5. (Optional) Install as a login item — starts automatically on login
+make install MODEL_DIR=$(pwd)/voxtral-model
+```
+
+Once running, the voxtral icon appears in the menu bar. Press **Option+Space** to begin recording (icon fills in, you hear a soft click), then speak. After ~2 seconds of silence the recording stops (another click), and the text is injected into the focused app. Press **Escape** mid-recording to cancel without pasting.
+
+#### Permissions
+
+Two permissions are required, both one-time:
+
+| Permission | Why | Where to grant |
+|-----------|-----|----------------|
+| **Accessibility** | Text injection via CGEvent | System Settings → Privacy & Security → Accessibility |
+| **Input Monitoring** | Global Option+Space hotkey | System Settings → Privacy & Security → Input Monitoring |
+
+After granting, restart voxtral. If either is missing, voxtral prints the exact System Settings path and exits.
+
+#### Config file
+
+voxtral reads `~/.config/voxtral/config` at startup. The file is created automatically on first run. All keys are optional — CLI flags take precedence.
+
+```
+# ~/.config/voxtral/config
+#
+# model_dir = /path/to/voxtral-model   (overridden by -d flag)
+# silence_threshold = 0.01             (RMS level below which mic is considered silent)
+# silence_duration_ms = 2000           (ms of silence before auto-stop)
+# processing_interval = 2.0            (encoder chunk frequency in seconds; same as -I)
+# sound = on                           (on/off — play system sounds on start/stop)
+```
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `model_dir` | (none) | Path to model weights directory. Equivalent to `-d`. |
+| `silence_threshold` | `0.01` | RMS level below which audio is considered silence. Raise for noisy environments. |
+| `silence_duration_ms` | `2000` | Milliseconds of silence before auto-stop. |
+| `processing_interval` | `2.0` | How often the encoder processes buffered audio (seconds). Equivalent to `-I`. |
+| `sound` | `on` | `on` or `off`. System sounds on recording start/stop. |
+
+#### Installing as a login item
+
+`make install` installs voxtral to `/usr/local/bin` and registers it with launchd so it starts automatically at login and restarts on crash:
+
+```bash
+make install MODEL_DIR=/path/to/voxtral-model
+```
+
+launchd writes stderr to `~/.config/voxtral/voxtral.log`.
+
+To stop and uninstall:
+
+```bash
+make uninstall
+```
+
+This stops the running process, removes the launchd agent, and deletes the binary. `make uninstall` runs `launchctl bootout` before deleting the plist — order matters because `KeepAlive: true` would otherwise restart the process immediately.
+
+#### Transcription history
+
+Every dictated phrase is appended to `~/.config/voxtral/history.log` with a timestamp:
+
+```
+[2026-04-06 12:00:00] Hello world
+[2026-04-06 12:00:45] Open the terminal and run make test
+```
+
+The log is plain text and greppable. It is never rotated.
+
+#### Single instance
+
+If voxtral is already running, a second invocation exits immediately with an "already running" message. The lock is `~/.config/voxtral/voxtral.pid` (held via `flock`).
 
 ### C API
 
@@ -294,9 +390,12 @@ sudo dnf install openblas-devel
 
 Other targets:
 ```bash
-make clean      # Clean build artifacts
-make info       # Show available backends for this platform
-make inspect    # Build safetensors weight inspector
+make wexproflow                        # Apple Silicon + Option+Space dictation mode
+make install MODEL_DIR=/path/to/model  # Install binary + launchd login item
+make uninstall                         # Remove launchd agent + binary
+make clean                             # Clean build artifacts
+make info                              # Show available backends for this platform
+make inspect                           # Build safetensors weight inspector
 ```
 
 ## Model Download

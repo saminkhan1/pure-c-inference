@@ -22,4 +22,7 @@ int vox_mic_read_available(void);
 /* Stop capture and free resources. */
 void vox_mic_stop(void);
 
+/* Final cleanup: dispose of the persistent AudioQueue (call on app exit). */
+void vox_mic_cleanup(void);
+
 #endif /* VOXTRAL_MIC_H */

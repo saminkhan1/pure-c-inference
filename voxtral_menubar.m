@@ -12,8 +12,8 @@
 #include "voxtral_menubar.h"
 #include <pthread.h>
 
-/* Forward declaration for the quit callback */
-extern volatile sig_atomic_t mic_interrupted;
+/* Shared state with main.c wexproflow worker */
+extern int mic_interrupted; /* plain int, accessed via __atomic built-ins */
 extern pthread_mutex_t wf_mutex;
 extern pthread_cond_t  wf_cond;
 
@@ -148,10 +148,15 @@ void vox_menubar_set_recording(int active) {
 
 void vox_menubar_quit(void) {
     /* Signal the wexproflow thread to exit */
-    mic_interrupted = 1;
+    __atomic_store_n(&mic_interrupted, 1, __ATOMIC_SEQ_CST);
     pthread_mutex_lock(&wf_mutex);
     pthread_cond_signal(&wf_cond);
     pthread_mutex_unlock(&wf_mutex);
+    /* Also stop NSApp directly so the menu bar disappears immediately,
+     * rather than waiting for the worker to finish its current inference. */
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSApp terminate:nil];
+    });
 }
 
 #else /* !__APPLE__ */

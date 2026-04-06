@@ -12,6 +12,7 @@
 #include <ApplicationServices/ApplicationServices.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int vox_type_text(const char *text) {
     if (!text || !text[0]) return 0;
@@ -63,6 +64,7 @@ int vox_type_text(const char *text) {
         CGEventPost(kCGHIDEventTap, up);
         CFRelease(down);
         CFRelease(up);
+        usleep(1000); /* 1ms: prevent event flooding in Electron apps */
 
         i += chunk;
     }

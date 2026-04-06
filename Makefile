@@ -18,7 +18,7 @@ TARGET = voxtral
 # Debug build flags
 DEBUG_CFLAGS = -Wall -Wextra -g -O0 -DDEBUG -fsanitize=address
 
-.PHONY: all clean debug info help blas mps wexproflow inspect test
+.PHONY: all clean debug info help blas mps wexproflow inspect test install uninstall
 
 # Default: show available targets
 all: help
@@ -40,6 +40,8 @@ endif
 	@echo "  make clean    - Remove build artifacts"
 	@echo "  make inspect  - Build safetensors weight inspector"
 	@echo "  make info     - Show build configuration"
+	@echo "  make install MODEL_DIR=/path  - Install + register launchd agent (auto-start on login)"
+	@echo "  make uninstall               - Unregister launchd agent and remove binary"
 	@echo ""
 	@echo "Example: make blas && ./voxtral -d voxtral-model -i audio.wav"
 
@@ -88,18 +90,23 @@ voxtral_metal.o: voxtral_metal.m voxtral_metal.h voxtral_shaders_source.h
 # =============================================================================
 # Target: wexproflow (MPS + hotkey dictation mode)
 # =============================================================================
-WEXPROFLOW_SRCS = voxtral_hotkey_macos.c voxtral_paste_macos.c
+WEXPROFLOW_SRCS = voxtral_hotkey_macos.c voxtral_paste_macos.c voxtral_config.c
 WEXPROFLOW_CFLAGS = $(MPS_CFLAGS) -DWEXPROFLOW
-WEXPROFLOW_LDFLAGS = -framework CoreGraphics -framework ApplicationServices
+WEXPROFLOW_OBJCFLAGS = $(WEXPROFLOW_CFLAGS) -fobjc-arc
+WEXPROFLOW_LDFLAGS = -framework CoreGraphics -framework ApplicationServices \
+                     -framework AppKit -framework Foundation
 
 wexproflow: clean wexproflow-build
 	@echo ""
-	@echo "Built with MPS backend + wexproflow mode"
+	@echo "Built with MPS backend + dictation mode (Option+Space)"
 
-main.wexproflow.o: main.c voxtral.h voxtral_kernels.h voxtral_mic.h voxtral_hotkey.h voxtral_paste.h
+main.wexproflow.o: main.c voxtral.h voxtral_kernels.h voxtral_mic.h voxtral_hotkey.h voxtral_paste.h voxtral_menubar.h voxtral_sound.h voxtral_config.h
 	$(CC) $(WEXPROFLOW_CFLAGS) -c -o $@ $<
 
-wexproflow-build: $(SRCS:.c=.mps.o) $(WEXPROFLOW_SRCS:.c=.mps.o) voxtral_metal.o main.wexproflow.o
+voxtral_menubar.wexproflow.o: voxtral_menubar.m voxtral_menubar.h
+	$(CC) $(WEXPROFLOW_OBJCFLAGS) -c -o $@ $<
+
+wexproflow-build: $(SRCS:.c=.mps.o) $(WEXPROFLOW_SRCS:.c=.mps.o) voxtral_metal.o voxtral_menubar.wexproflow.o main.wexproflow.o
 	$(CC) $(WEXPROFLOW_CFLAGS) -o $(TARGET) $^ $(MPS_LDFLAGS) $(WEXPROFLOW_LDFLAGS)
 
 else
@@ -135,17 +142,54 @@ inspect: inspect_weights.o voxtral_safetensors.o
 	$(CC) $(CFLAGS) -o inspect_weights $^ $(LDFLAGS)
 
 # =============================================================================
+# Install / Uninstall (dictation service, macOS only)
+# Usage: make install MODEL_DIR=/path/to/voxtral-model
+# =============================================================================
+INSTALL_BIN  = /usr/local/bin/voxtral
+PLIST_NAME   = com.voxtral.agent
+PLIST_DEST   = $(HOME)/Library/LaunchAgents/$(PLIST_NAME).plist
+
+install: $(TARGET)
+	@[ -n "$(MODEL_DIR)" ] || (echo "Error: specify MODEL_DIR, e.g. make install MODEL_DIR=/path/to/voxtral-model" && exit 1)
+	@plutil -lint $(PLIST_NAME).plist || (echo "Error: plist validation failed" && exit 1)
+	install -m 555 $(TARGET) $(INSTALL_BIN)
+	sed -e "s|__VOXTRAL_BIN__|$(INSTALL_BIN)|g" \
+	    -e "s|__MODEL_DIR__|$(MODEL_DIR)|g" \
+	    -e "s|__HOME__|$(HOME)|g" \
+	    $(PLIST_NAME).plist > $(PLIST_DEST)
+	launchctl bootstrap gui/$$(id -u) $(PLIST_DEST)
+	@echo "Installed. voxtral will start on login and run in the menu bar."
+
+uninstall:
+	-launchctl bootout gui/$$(id -u)/$(PLIST_NAME) 2>/dev/null || true
+	-rm -f $(PLIST_DEST)
+	-rm -f $(INSTALL_BIN)
+	@echo "Uninstalled."
+
+# =============================================================================
 # Test
 # =============================================================================
 test:
 	@./runtest.sh
+
+# Fast mic start/stop cycle test — no model needed, runs in <5s
+ifeq ($(UNAME_S),Darwin)
+test-mic: test_mic_cycle.mps.o voxtral_mic_macos.mps.o
+	$(CC) $(MPS_CFLAGS) -o test_mic_cycle $^ $(MPS_LDFLAGS)
+	@echo "--- running mic cycle test ---"
+	@./test_mic_cycle
+	@echo "--- mic cycle test complete ---"
+else
+test-mic:
+	@echo "test-mic: mic test only supported on macOS"
+endif
 
 # =============================================================================
 # Utilities
 # =============================================================================
 clean:
 	rm -f $(OBJS) *.mps.o *.wexproflow.o voxtral_metal.o main.o inspect_weights.o $(TARGET) inspect_weights
-	rm -f voxtral_shaders_source.h
+	rm -f voxtral_shaders_source.h voxtral_menubar.wexproflow.o
 
 info:
 	@echo "Platform: $(UNAME_S) $(UNAME_M)"
