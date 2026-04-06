@@ -172,7 +172,6 @@ static int kv_cache_init(vox_ctx_t *ctx, int max_seq) {
     int kv_dim = VOX_DEC_KV_HEADS * VOX_DEC_HEAD_DIM; /* 8 * 128 = 1024 */
     size_t elems = (size_t)VOX_DEC_LAYERS * max_seq * kv_dim;
     size_t cache_size_f32 = elems * sizeof(float);
-    size_t cache_size_f16 = elems * sizeof(uint16_t);
 
     ctx->kv_cache_k = NULL;
     ctx->kv_cache_v = NULL;
@@ -181,6 +180,7 @@ static int kv_cache_init(vox_ctx_t *ctx, int max_seq) {
 
 #ifdef USE_METAL
     if (vox_metal_available() && ctx->kv_cache_fp16) {
+        size_t cache_size_f16 = elems * sizeof(uint16_t);
         ctx->kv_cache_k_f16 = (uint16_t *)vox_metal_shared_alloc(cache_size_f16);
         ctx->kv_cache_v_f16 = (uint16_t *)vox_metal_shared_alloc(cache_size_f16);
     } else if (vox_metal_available()) {

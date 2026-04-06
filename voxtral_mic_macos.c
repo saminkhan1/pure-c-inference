@@ -17,7 +17,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-#include <sys/time.h>
 
 #define MIC_SAMPLE_RATE   16000
 #define MIC_NUM_BUFFERS   3
@@ -28,100 +27,23 @@ static AudioQueueRef            queue = NULL;
 static AudioQueueBufferRef      buffers[MIC_NUM_BUFFERS];
 static pthread_mutex_t          ring_mutex = PTHREAD_MUTEX_INITIALIZER;
 static float                    ring[RING_CAPACITY];
-static int                      ring_head;  /* next write position */
-static int                      ring_count; /* samples in ring */
+static int                      ring_head;
+static int                      ring_count;
 static int                      running;
 
-/* Lock tracking for debugging */
-static _Atomic pthread_t        mutex_owner;
-static _Atomic int              mutex_locked = 0;
-static _Atomic int              mutex_waiters = 0;
-
-static double get_now_ms(void) {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
-}
-
-static void debug_lock(const char *ctx) {
-    pthread_t self = pthread_self();
-    double start = get_now_ms();
-    
-    if (mutex_locked) {
-        if (pthread_equal(mutex_owner, self)) {
-            fprintf(stderr, "mic: [DEBUG] %s - thread %p DEADLOCK: already holds lock!\n", ctx, self);
-            fflush(stderr);
-        } else {
-            mutex_waiters++;
-            fprintf(stderr, "mic: [DEBUG] %s - thread %p waiting for lock held by %p (waiters: %d)\n", 
-                    ctx, self, mutex_owner, (int)mutex_waiters);
-            fflush(stderr);
-        }
-    }
-    
-    pthread_mutex_lock(&ring_mutex);
-    
-    if (mutex_locked && !pthread_equal(mutex_owner, self)) {
-        mutex_waiters--;
-    }
-    
-    mutex_owner = self;
-    mutex_locked = 1;
-    double elapsed = get_now_ms() - start;
-    if (elapsed > 1.0) {
-        fprintf(stderr, "mic: [DEBUG] %s - thread %p acquired lock after %.2f ms\n", ctx, self, elapsed);
-    } else {
-        fprintf(stderr, "mic: [DEBUG] %s - thread %p acquired lock\n", ctx, self);
-    }
-    fflush(stderr);
-}
-
-static void debug_unlock(const char *ctx) {
-    pthread_t self = pthread_self();
-    if (!mutex_locked || !pthread_equal(mutex_owner, self)) {
-        fprintf(stderr, "mic: [DEBUG] %s - thread %p ERROR: releasing lock it doesn't hold!\n", ctx, self);
-    }
-    fprintf(stderr, "mic: [DEBUG] %s - thread %p releasing lock\n", ctx, self);
-    mutex_locked = 0;
-    pthread_mutex_unlock(&ring_mutex);
-    fflush(stderr);
-}
-
-static int debug_trylock(const char *ctx) {
-    pthread_t self = pthread_self();
-    int err = pthread_mutex_trylock(&ring_mutex);
-    if (err == 0) {
-        mutex_owner = self;
-        mutex_locked = 1;
-        fprintf(stderr, "mic: [DEBUG] %s - thread %p acquired lock (try)\n", ctx, self);
-    } else {
-        fprintf(stderr, "mic: [DEBUG] %s - thread %p trylock failed (%d), held by %p, waiters: %d\n", 
-                ctx, self, err, mutex_owner, (int)mutex_waiters);
-    }
-    fflush(stderr);
-    return err;
-}
-
-/* AudioQueue input callback — runs on AudioQueue's own thread */
 static void mic_callback(void *userdata,
-                          AudioQueueRef inAQ,
-                          AudioQueueBufferRef inBuffer,
-                          const AudioTimeStamp *inStartTime,
-                          UInt32 inNumberPacketDescriptions,
-                          const AudioStreamPacketDescription *inPacketDescs) {
+                         AudioQueueRef inAQ,
+                         AudioQueueBufferRef inBuffer,
+                         const AudioTimeStamp *inStartTime,
+                         UInt32 inNumberPacketDescriptions,
+                         const AudioStreamPacketDescription *inPacketDescs) {
     (void)userdata; (void)inStartTime;
     (void)inNumberPacketDescriptions; (void)inPacketDescs;
 
-    fprintf(stderr, "mic: callback AT START (thread %p, queue %p)\n", pthread_self(), inAQ);
-    fflush(stderr);
-
-    if (debug_trylock("callback") != 0) {
-        debug_lock("callback (wait)");
-    }
+    pthread_mutex_lock(&ring_mutex);
 
     if (!running) {
-        fprintf(stderr, "mic: callback ignored (running=0, queue %p, thread %p)\n", inAQ, pthread_self());
-        debug_unlock("callback (ignored)");
+        pthread_mutex_unlock(&ring_mutex);
         return;
     }
 
@@ -135,62 +57,36 @@ static void mic_callback(void *userdata,
             ring_count++;
     }
 
-    /* Re-enqueue buffer for next capture. Holding ring_mutex ensures that
-     * vox_mic_stop() can't set running=0 and call AudioQueueStop between our
-     * check and the enqueue. */
-    fprintf(stderr, "mic: callback enqueuing buffer %p (thread %p)...\n", inBuffer, pthread_self());
-    fflush(stderr);
     OSStatus err = AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
     if (err != noErr) {
-        fprintf(stderr, "mic: callback AudioQueueEnqueueBuffer returned %d\n", (int)err);
-        fflush(stderr);
+        fprintf(stderr, "mic: AudioQueueEnqueueBuffer failed: %d\n", (int)err);
     }
-    
-    debug_unlock("callback (finished)");
+
+    pthread_mutex_unlock(&ring_mutex);
 }
 
 int vox_mic_start(void) {
-    fprintf(stderr, "mic: vox_mic_start entering (thread %p)...\n", pthread_self());
-    debug_lock("vox_mic_start");
-    
+    pthread_mutex_lock(&ring_mutex);
+
     if (running) {
-        debug_unlock("vox_mic_start (already running)");
-        fprintf(stderr, "mic: vox_mic_start already running\n");
+        pthread_mutex_unlock(&ring_mutex);
         return 0;
     }
 
-    /* Reuse existing queue if available (paused state from previous recording) */
     if (queue != NULL) {
-        fprintf(stderr, "mic: reusing existing queue %p\n", queue);
-        
-        /* Clear ring buffer for fresh recording while we hold the lock */
         ring_head = 0;
         ring_count = 0;
-        
-        /* Release lock before AudioQueueReset which can trigger callbacks */
-        debug_unlock("vox_mic_start (pre-Reset)");
-        
-        /* Reset the queue to clear any stale state from previous recording */
-        fprintf(stderr, "mic: AudioQueueReset (queue %p)...\n", queue);
-        fflush(stderr);
+        pthread_mutex_unlock(&ring_mutex);
+
         OSStatus err = AudioQueueReset(queue);
         if (err != noErr) {
-            fprintf(stderr, "mic: AudioQueueReset failed: %d, will recreate queue\n", (int)err);
-            /* Need to re-acquire lock to modify queue */
-            debug_lock("vox_mic_start (post-Reset failed)");
             AudioQueueDispose(queue, true);
             queue = NULL;
-            debug_unlock("vox_mic_start (disposed)");
-        } else {
-            fprintf(stderr, "mic: AudioQueueReset succeeded\n");
-            /* Re-acquire lock before continuing */
-            debug_lock("vox_mic_start (post-Reset)");
         }
+        pthread_mutex_lock(&ring_mutex);
     }
-    
-    /* Create new queue if needed (first time or reset failed) */
+
     if (queue == NULL) {
-        /* First-time initialization: create new queue */
         AudioStreamBasicDescription fmt = {0};
         fmt.mSampleRate       = MIC_SAMPLE_RATE;
         fmt.mFormatID         = kAudioFormatLinearPCM;
@@ -201,60 +97,43 @@ int vox_mic_start(void) {
         fmt.mFramesPerPacket  = 1;
         fmt.mBytesPerPacket   = 2;
 
-        fprintf(stderr, "mic: AudioQueueNewInput (thread %p)...\n", pthread_self());
-        fflush(stderr);
-        /* NULL runloop/mode means callbacks run on a system-managed thread. */
         OSStatus err = AudioQueueNewInput(&fmt, mic_callback, NULL,
                                            NULL, NULL, 0, &queue);
         if (err != noErr) {
-            debug_unlock("vox_mic_start (failed NewInput)");
+            pthread_mutex_unlock(&ring_mutex);
             fprintf(stderr, "mic: AudioQueueNewInput failed: %d\n", (int)err);
             return -1;
         }
-        fprintf(stderr, "mic: created queue %p\n", queue);
 
-        /* Allocate buffers */
         UInt32 buf_bytes = MIC_BUF_SAMPLES * sizeof(int16_t);
         for (int i = 0; i < MIC_NUM_BUFFERS; i++) {
             AudioQueueAllocateBuffer(queue, buf_bytes, &buffers[i]);
-            fprintf(stderr, "mic: allocated buffer %d (%p)\n", i, buffers[i]);
         }
     }
-    
-    /* Clear ring buffer for fresh recording */
+
     ring_head = 0;
     ring_count = 0;
     running = 1;
-    
-    /* RELEASING LOCK before potentially triggering callbacks via Enqueue/Start. */
-    debug_unlock("vox_mic_start (releasing lock for setup)");
+    pthread_mutex_unlock(&ring_mutex);
 
     for (int i = 0; i < MIC_NUM_BUFFERS; i++) {
-        fprintf(stderr, "mic: enqueuing buffer %d (%p, thread %p)...\n", i, buffers[i], pthread_self());
         AudioQueueEnqueueBuffer(queue, buffers[i], 0, NULL);
     }
 
-    fprintf(stderr, "mic: AudioQueueStart (queue %p, thread %p)...\n", queue, pthread_self());
-    fflush(stderr);
-    double t0 = get_now_ms();
     OSStatus err = AudioQueueStart(queue, NULL);
-    fprintf(stderr, "mic: AudioQueueStart returned %d (thread %p, took %.2f ms)\n", 
-            (int)err, pthread_self(), get_now_ms() - t0);
-    fflush(stderr);
-
     if (err != noErr) {
-        debug_lock("vox_mic_start (failed Start recovery)");
+        pthread_mutex_lock(&ring_mutex);
         running = 0;
-        debug_unlock("vox_mic_start (failed Start)");
+        pthread_mutex_unlock(&ring_mutex);
         fprintf(stderr, "mic: AudioQueueStart failed: %d\n", (int)err);
         return -1;
     }
-    
+
     return 0;
 }
 
 int vox_mic_read(float *out, int max_samples) {
-    debug_lock("vox_mic_read");
+    pthread_mutex_lock(&ring_mutex);
     int n = ring_count < max_samples ? ring_count : max_samples;
     if (n > 0) {
         int tail = (ring_head - ring_count + RING_CAPACITY) % RING_CAPACITY;
@@ -263,53 +142,43 @@ int vox_mic_read(float *out, int max_samples) {
         }
         ring_count -= n;
     }
-    debug_unlock("vox_mic_read");
+    pthread_mutex_unlock(&ring_mutex);
     return n;
 }
 
 int vox_mic_read_available(void) {
-    debug_lock("vox_mic_read_available");
+    pthread_mutex_lock(&ring_mutex);
     int n = ring_count;
-    debug_unlock("vox_mic_read_available");
+    pthread_mutex_unlock(&ring_mutex);
     return n;
 }
 
 void vox_mic_stop(void) {
-    debug_lock("vox_mic_stop");
+    pthread_mutex_lock(&ring_mutex);
     if (!running) {
-        debug_unlock("vox_mic_stop (not running)");
+        pthread_mutex_unlock(&ring_mutex);
         return;
     }
     running = 0;
-    debug_unlock("vox_mic_stop (pre-Pause)");
+    pthread_mutex_unlock(&ring_mutex);
 
-    /* Use Pause to keep queue alive for reuse */
-    fprintf(stderr, "mic: AudioQueuePause (queue %p, thread %p)...\n", queue, pthread_self());
-    fflush(stderr);
-    OSStatus err = AudioQueuePause(queue);
-    if (err != noErr) {
-        fprintf(stderr, "mic: AudioQueuePause failed: %d\n", (int)err);
-    }
-    fprintf(stderr, "mic: recording paused (queue %p kept alive for reuse)\n", queue);
+    AudioQueuePause(queue);
 }
 
 void vox_mic_cleanup(void) {
-    debug_lock("vox_mic_cleanup");
+    pthread_mutex_lock(&ring_mutex);
     if (queue) {
         if (running) {
             running = 0;
-            debug_unlock("vox_mic_cleanup (pre-Stop)");
+            pthread_mutex_unlock(&ring_mutex);
             AudioQueueStop(queue, true);
-            debug_lock("vox_mic_cleanup (post-Stop)");
+            pthread_mutex_lock(&ring_mutex);
         }
-        fprintf(stderr, "mic: AudioQueueDispose (queue %p, thread %p)\n", queue, pthread_self());
-        fflush(stderr);
         AudioQueueDispose(queue, true);
         queue = NULL;
     }
-    debug_unlock("vox_mic_cleanup");
+    pthread_mutex_unlock(&ring_mutex);
 }
-
 
 
 #else /* !__APPLE__ */

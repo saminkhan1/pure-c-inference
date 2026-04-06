@@ -55,6 +55,7 @@ static void sigint_handler(int sig) {
 }
 
 /* ---- PID file for single-instance ---- */
+#ifdef WEXPROFLOW
 static int pid_fd = -1;
 static char pid_path[512];
 
@@ -107,6 +108,7 @@ static void history_append(const char *text) {
     dprintf(fd, "[%s] %s\n", ts, text);
     close(fd);
 }
+#endif /* WEXPROFLOW */
 
 /* ---- wexproflow state (visible to voxtral_menubar.m) ---- */
 #ifdef WEXPROFLOW
