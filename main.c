@@ -8,9 +8,12 @@
 #include "voxtral_kernels.h"
 #include "voxtral_audio.h"
 #include "voxtral_mic.h"
+#include "voxtral_config.h"
 #ifdef WEXPROFLOW
 #include "voxtral_hotkey.h"
 #include "voxtral_paste.h"
+#include "voxtral_menubar.h"
+#include "voxtral_sound.h"
 #endif
 #ifdef USE_METAL
 #include "voxtral_metal.h"
@@ -23,18 +26,22 @@
 #include <math.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <sys/file.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <time.h>
 
 #define DEFAULT_FEED_CHUNK 16000 /* 1 second at 16kHz */
 
-/* SIGINT handler for clean exit */
-static volatile sig_atomic_t mic_interrupted = 0;
+/* SIGINT/SIGTERM handler for clean exit */
+volatile sig_atomic_t mic_interrupted = 0;
 static void sigint_handler(int sig) { (void)sig; mic_interrupted = 1; }
 
-/* ---- wexproflow state ---- */
+/* ---- wexproflow state (visible to voxtral_menubar.m) ---- */
 #ifdef WEXPROFLOW
-static volatile int wf_event = 0; /* 0=none, 1=toggle, 2=cancel */
-static pthread_mutex_t wf_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t  wf_cond  = PTHREAD_COND_INITIALIZER;
+volatile int wf_event = 0; /* 0=none, 1=toggle, 2=cancel */
+pthread_mutex_t wf_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t  wf_cond  = PTHREAD_COND_INITIALIZER;
 
 static void wexproflow_hotkey_cb(vox_hotkey_event_t event) {
     pthread_mutex_lock(&wf_mutex);
@@ -44,6 +51,57 @@ static void wexproflow_hotkey_cb(vox_hotkey_event_t event) {
 }
 #endif /* WEXPROFLOW */
 
+/* ---- PID file for single-instance ---- */
+static int pid_fd = -1;
+static char pid_path[512];
+
+static int pid_lock_acquire(void) {
+    const char *home = getenv("HOME");
+    if (!home) return 0;
+    char dir[512];
+    snprintf(dir, sizeof(dir), "%s/.config/voxtral", home);
+    mkdir(dir, 0755);
+    snprintf(pid_path, sizeof(pid_path), "%s/.config/voxtral/voxtral.pid", home);
+    pid_fd = open(pid_path, O_CREAT | O_RDWR, 0644);
+    if (pid_fd < 0) return 0;
+    if (flock(pid_fd, LOCK_EX | LOCK_NB) != 0) {
+        fprintf(stderr, "voxtral is already running (pid file: %s)\n", pid_path);
+        close(pid_fd);
+        pid_fd = -1;
+        return -1;
+    }
+    ftruncate(pid_fd, 0);
+    dprintf(pid_fd, "%d\n", getpid());
+    return 0;
+}
+
+static void pid_lock_release(void) {
+    if (pid_fd >= 0) {
+        unlink(pid_path);
+        flock(pid_fd, LOCK_UN);
+        close(pid_fd);
+        pid_fd = -1;
+    }
+}
+
+/* ---- History log ---- */
+static void history_append(const char *text) {
+    if (!text || !text[0]) return;
+    const char *home = getenv("HOME");
+    if (!home) return;
+    char path[512];
+    snprintf(path, sizeof(path), "%s/.config/voxtral/history.log", home);
+    int fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (fd < 0) return;
+    time_t now = time(NULL);
+    struct tm tm;
+    localtime_r(&now, &tm);
+    char ts[32];
+    strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", &tm);
+    dprintf(fd, "[%s] %s\n", ts, text);
+    close(fd);
+}
+
 static void usage(const char *prog) {
     fprintf(stderr, "voxtral.c — Voxtral Realtime 4B speech-to-text\n\n");
     fprintf(stderr, "Usage: %s -d <model_dir> (-i <input.wav> | --stdin | --from-mic) [options]\n\n", prog);
@@ -52,7 +110,7 @@ static void usage(const char *prog) {
     fprintf(stderr, "  -i <file>     Input WAV file (16-bit PCM, any sample rate)\n");
     fprintf(stderr, "  --stdin       Read audio from stdin (auto-detect WAV or raw s16le 16kHz mono)\n");
     fprintf(stderr, "  --from-mic    Capture from default microphone (macOS only, Ctrl+C to stop)\n");
-    fprintf(stderr, "  --wexproflow  Hotkey dictation mode: Option+Space to record, paste on silence\n");
+    fprintf(stderr, "  --dictate     Hotkey dictation: Option+Space to record, auto-paste on silence\n");
     fprintf(stderr, "\nOptions:\n");
     fprintf(stderr, "  -I <secs>     Encoder processing interval in seconds (default: 2.0)\n");
     fprintf(stderr, "  --alt <c>     Show alternative tokens within cutoff distance (0.0-1.0)\n");
@@ -168,7 +226,8 @@ int main(int argc, char **argv) {
             use_stdin = 1;
         } else if (strcmp(argv[i], "--from-mic") == 0) {
             use_mic = 1;
-        } else if (strcmp(argv[i], "--wexproflow") == 0) {
+        } else if (strcmp(argv[i], "--dictate") == 0 ||
+                   strcmp(argv[i], "--wexproflow") == 0) {
             use_wexproflow = 1;
         } else if (strcmp(argv[i], "--monitor") == 0) {
             extern int vox_monitor;
@@ -192,7 +251,7 @@ int main(int argc, char **argv) {
         return 1;
     }
     if ((input_wav ? 1 : 0) + use_stdin + use_mic + use_wexproflow > 1) {
-        fprintf(stderr, "Error: -i, --stdin, --from-mic, and --wexproflow are mutually exclusive\n");
+        fprintf(stderr, "Error: -i, --stdin, --from-mic, and --dictate are mutually exclusive\n");
         return 1;
     }
 
@@ -213,7 +272,7 @@ int main(int argc, char **argv) {
     /* ---- wexproflow mode ---- */
     if (use_wexproflow) {
 #ifndef WEXPROFLOW
-        fprintf(stderr, "Error: --wexproflow requires building with 'make wexproflow'\n");
+        fprintf(stderr, "Error: --dictate requires building with 'make wexproflow'\n");
 #ifdef USE_METAL
         vox_metal_shutdown();
 #endif
