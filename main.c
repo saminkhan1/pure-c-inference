@@ -30,8 +30,20 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/stat.h>
 
 #define DEFAULT_FEED_CHUNK 16000 /* 1 second at 16kHz */
+
+/* JSON metrics state */
+static int json_metrics = 0;
+static double json_time_start_ms = 0;
+static double json_time_first_token_ms = 0;
+
+static double now_ms(void) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
+}
 
 /* SIGINT/SIGTERM handler for clean exit */
 volatile sig_atomic_t mic_interrupted = 0;
@@ -133,6 +145,7 @@ static void drain_tokens(vox_stream_t *s) {
             for (int i = 0; i < n; i++) {
                 const char *t = tokens[i];
                 if (first_token) {
+                    if (json_metrics) json_time_first_token_ms = now_ms();
                     while (*t == ' ') t++;
                     first_token = 0;
                 }
@@ -162,6 +175,7 @@ static void drain_tokens(vox_stream_t *s) {
                         if (a > 0) fputc('|', stdout);
                         const char *t = alt;
                         if (a == 0 && first_token) {
+                            if (json_metrics) json_time_first_token_ms = now_ms();
                             while (*t == ' ') t++;
                             first_token = 0;
                         }
@@ -171,6 +185,7 @@ static void drain_tokens(vox_stream_t *s) {
                 } else {
                     const char *t = best;
                     if (first_token) {
+                        if (json_metrics) json_time_first_token_ms = now_ms();
                         while (*t == ' ') t++;
                         first_token = 0;
                     }
@@ -185,6 +200,7 @@ static void drain_tokens(vox_stream_t *s) {
 /* Feed audio in chunks, printing tokens as they become available.
  * feed_chunk controls granularity: smaller = more responsive token output. */
 static int feed_chunk = DEFAULT_FEED_CHUNK;
+
 static void feed_and_drain(vox_stream_t *s, const float *samples, int n_samples) {
     int off = 0;
     while (off < n_samples) {
@@ -236,6 +252,8 @@ int main(int argc, char **argv) {
             verbosity = 2;
         } else if (strcmp(argv[i], "--silent") == 0) {
             verbosity = 0;
+        } else if (strcmp(argv[i], "--json-metrics") == 0) {
+            json_metrics = 1;
         } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
             usage(argv[0]);
             return 0;
@@ -684,6 +702,7 @@ int main(int argc, char **argv) {
             fprintf(stderr, "Audio: %d samples (%.1f seconds)\n",
                     n_samples, (float)n_samples / VOX_SAMPLE_RATE);
 
+        if (json_metrics) json_time_start_ms = now_ms();
         feed_and_drain(s, samples, n_samples);
         free(samples);
     }
@@ -692,6 +711,13 @@ int main(int argc, char **argv) {
     drain_tokens(s);
     fputs("\n", stdout);
     fflush(stdout);
+
+    if (json_metrics && json_time_start_ms > 0) {
+        double time_final_ms = now_ms();
+        fprintf(stderr, "JSON_METRICS: {\"time_to_first_token_ms\": %.2f, \"time_to_final_ms\": %.2f}\n",
+            (json_time_first_token_ms > 0 ? json_time_first_token_ms - json_time_start_ms : 0.0),
+            time_final_ms - json_time_start_ms);
+    }
 
     vox_stream_free(s);
     vox_free(ctx);
