@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/raycast/extensions/main/package-schema.json",
+  "name": "voxtral-dictation",
+  "title": "Voxtral Dictation",
+  "description": "Free, local, privacy-preserving speech-to-text dictation using Apple Silicon",
+  "icon": "extension-icon.png",
+  "author": "YourRaycastUsername",
+  "license": "MIT",
+  "categories": ["Productivity"],
+  "platforms": ["macOS"],
+  "commands": [
+    {
+      "name": "dictate",
+      "title": "Dictate",
+      "subtitle": "Voice to text",
+      "description": "Record audio and transcribe using local Voxtral model",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "binaryPath",
+      "type": "textfield",
+      "title": "Voxtral Binary Path",
+      "description": "Full path to the voxtral binary",
+      "required": true,
+      "placeholder": "/usr/local/bin/voxtral"
+    },
+    {
+      "name": "modelPath",
+      "type": "textfield",
+      "title": "Model Path",
+      "description": "Path to the voxtral model directory",
+      "required": true,
+      "placeholder": "voxtral-model"
+    },
+    {
+      "name": "autoPaste",
+      "type": "checkbox",
+      "title": "Auto-Paste",
+      "description": "Automatically paste transcription to active app when done",
+      "default": true
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.90.0",
+    "@raycast/utils": "^1.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "dev": "ray develop",
+    "build": "ray build",
+    "lint": "ray lint",
+    "prepublishOnly": "echo \"\n\nIt seems like you are trying to publish the Raycast extension to npm.\n\nIf you did intend to publish it to npm, remove the `prepublishOnly` script and rerun `npm publish` again.\n\nIf you wanted to publish to the Raycast Store instead, use `npm run publish` instead.\n\n\" && exit 1",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}
