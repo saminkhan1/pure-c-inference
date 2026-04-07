@@ -90,7 +90,7 @@ voxtral_metal.o: voxtral_metal.m voxtral_metal.h voxtral_shaders_source.h
 # =============================================================================
 # Target: wexproflow (MPS + hotkey dictation mode)
 # =============================================================================
-WEXPROFLOW_SRCS = voxtral_hotkey_macos.c voxtral_paste_macos.c voxtral_config.c
+WEXPROFLOW_SRCS = voxtral_hotkey_macos.c voxtral_paste_macos.c
 WEXPROFLOW_CFLAGS = $(MPS_CFLAGS) -DWEXPROFLOW
 WEXPROFLOW_OBJCFLAGS = $(WEXPROFLOW_CFLAGS) -fobjc-arc
 WEXPROFLOW_LDFLAGS = -framework CoreGraphics -framework ApplicationServices \
@@ -100,7 +100,7 @@ wexproflow: clean wexproflow-build
 	@echo ""
 	@echo "Built with MPS backend + dictation mode (Option+Space)"
 
-main.wexproflow.o: main.c voxtral.h voxtral_kernels.h voxtral_mic.h voxtral_hotkey.h voxtral_paste.h voxtral_menubar.h voxtral_sound.h voxtral_config.h
+main.wexproflow.o: main.c voxtral.h voxtral_kernels.h voxtral_mic.h voxtral_hotkey.h voxtral_paste.h voxtral_menubar.h voxtral_sound.h
 	$(CC) $(WEXPROFLOW_CFLAGS) -c -o $@ $<
 
 voxtral_menubar.wexproflow.o: voxtral_menubar.m voxtral_menubar.h

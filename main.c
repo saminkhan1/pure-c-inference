@@ -8,7 +8,6 @@
 #include "voxtral_kernels.h"
 #include "voxtral_audio.h"
 #include "voxtral_mic.h"
-#include "voxtral_config.h"
 #ifdef WEXPROFLOW
 #include "voxtral_hotkey.h"
 #include "voxtral_paste.h"
@@ -34,6 +33,12 @@
 
 #define DEFAULT_FEED_CHUNK 16000 /* 1 second at 16kHz */
 
+/* Silence detection constants (shared by --from-mic and wexproflow) */
+#define MIC_WINDOW 160          /* 10ms at 16kHz */
+#define SILENCE_THRESH 0.01f   /* RMS threshold */
+#define SILENCE_PASS 60         /* pass-through windows (600ms) */
+#define DICTATE_AUTO_STOP_MS 2000 /* silence duration before auto-stop in dictate mode */
+
 /* JSON metrics state */
 static int json_metrics = 0;
 static double json_time_start_ms = 0;
@@ -45,14 +50,10 @@ static double now_ms(void) {
     return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
 
-/* SIGINT/SIGTERM handler for clean exit.
- * Plain int with GCC __atomic built-ins: works across signal handler,
- * main thread, and worker thread without volatile sig_atomic_t limitations. */
-int mic_interrupted = 0;
-static void sigint_handler(int sig) {
-    (void)sig;
-    __atomic_store_n(&mic_interrupted, 1, __ATOMIC_SEQ_CST);
-}
+/* SIGINT handler for clean exit.
+ * Uses volatile sig_atomic_t for safe cross-thread/signa communication. */
+volatile sig_atomic_t mic_interrupted = 0;
+static void sigint_handler(int sig) { (void)sig; mic_interrupted = 1; }
 
 /* ---- PID file for single-instance ---- */
 #ifdef WEXPROFLOW
@@ -66,10 +67,21 @@ static int pid_lock_acquire(void) {
         return 0;
     }
     char dir[512];
-    snprintf(dir, sizeof(dir), "%s/.config/voxtral", home);
-    mkdir(dir, 0755);
-    snprintf(pid_path, sizeof(pid_path), "%s/.config/voxtral/voxtral.pid", home);
-    pid_fd = open(pid_path, O_CREAT | O_RDWR, 0644);
+    int n = snprintf(dir, sizeof(dir), "%s/.config/voxtral", home);
+    if (n < 0 || (size_t)n >= sizeof(dir)) {
+        fprintf(stderr, "Warning: HOME path too long, skipping PID lock\n");
+        return 0;
+    }
+    if (mkdir(dir, 0755) != 0 && errno != EEXIST) {
+        fprintf(stderr, "Warning: failed to create config dir: %s\n", strerror(errno));
+        return -1;
+    }
+    n = snprintf(pid_path, sizeof(pid_path), "%s/.config/voxtral/voxtral.pid", home);
+    if (n < 0 || (size_t)n >= sizeof(pid_path)) {
+        fprintf(stderr, "Warning: HOME path too long, skipping PID lock\n");
+        return -1;
+    }
+    pid_fd = open(pid_path, O_CREAT | O_RDWR, 0600);
     if (pid_fd < 0) return 0;
     if (flock(pid_fd, LOCK_EX | LOCK_NB) != 0) {
         fprintf(stderr, "voxtral is already running (pid file: %s)\n", pid_path);
@@ -97,8 +109,9 @@ static void history_append(const char *text) {
     const char *home = getenv("HOME");
     if (!home) return;
     char path[512];
-    snprintf(path, sizeof(path), "%s/.config/voxtral/history.log", home);
-    int fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    int n = snprintf(path, sizeof(path), "%s/.config/voxtral/history.log", home);
+    if (n < 0 || (size_t)n >= sizeof(path)) return;
+    int fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0600);
     if (fd < 0) return;
     time_t now = time(NULL);
     struct tm tm;
@@ -127,16 +140,11 @@ static void wexproflow_hotkey_cb(vox_hotkey_event_t event) {
 struct wf_args {
     vox_ctx_t *ctx;
     float      interval;          /* encoder processing interval (<0 = use default) */
-    float      silence_threshold; /* RMS threshold for silence detection */
-    double     auto_stop_ms;      /* silence duration before auto-stop */
     int        sound_enabled;     /* play system sounds on start/stop */
 };
 
 static void *wexproflow_main(void *arg) {
     struct wf_args *a = (struct wf_args *)arg;
-
-    #define WF_WINDOW       160   /* 10ms at 16kHz */
-    #define WF_SILENCE_PASS  60   /* 600ms pass-through (natural pauses) */
 
     enum { WF_IDLE, WF_RECORDING } wf_state = WF_IDLE;
     vox_stream_t *wf_stream = NULL;
@@ -175,19 +183,19 @@ static void *wexproflow_main(void *arg) {
         } \
     } while (0)
 
-    while (!__atomic_load_n(&mic_interrupted, __ATOMIC_SEQ_CST)) {
+    while (!mic_interrupted) {
         if (wf_state == WF_IDLE) {
             /* Block until hotkey event or interrupt */
             pthread_mutex_lock(&wf_mutex);
-            while (wf_event == 0 && !__atomic_load_n(&mic_interrupted, __ATOMIC_SEQ_CST))
+            while (wf_event == 0 && !mic_interrupted)
                 pthread_cond_wait(&wf_cond, &wf_mutex);
             int ev = wf_event;
             wf_event = 0;
             pthread_mutex_unlock(&wf_mutex);
 
-            fprintf(stderr, "wf: IDLE event=%d interrupted=%d\n", ev, (int)__atomic_load_n(&mic_interrupted, __ATOMIC_SEQ_CST));
+            fprintf(stderr, "wf: IDLE event=%d interrupted=%d\n", ev, (int)mic_interrupted);
 
-            if (__atomic_load_n(&mic_interrupted, __ATOMIC_SEQ_CST)) break;
+            if (mic_interrupted) break;
             if (ev != 1) continue; /* ignore cancel when idle */
 
             fprintf(stderr, "wf: starting mic...\n");
@@ -281,31 +289,31 @@ static void *wexproflow_main(void *arg) {
 
         /* Silence detection in 10ms windows */
         int off = 0;
-        while (off + WF_WINDOW <= n) {
+        while (off + MIC_WINDOW <= n) {
             float energy = 0;
-            for (int i = 0; i < WF_WINDOW; i++) {
+            for (int i = 0; i < MIC_WINDOW; i++) {
                 float v = mic_buf[off + i];
                 energy += v * v;
             }
-            float rms = sqrtf(energy / WF_WINDOW);
+            float rms = sqrtf(energy / MIC_WINDOW);
 
-            if (rms > a->silence_threshold) {
+            if (rms > SILENCE_THRESH) {
                 if (wf_was_skipping)
                     wf_was_skipping = 0;
                 wf_heard_speech = 1;
                 gettimeofday(&wf_last_speech_tv, NULL);
-                vox_stream_feed(wf_stream, mic_buf + off, WF_WINDOW);
+                vox_stream_feed(wf_stream, mic_buf + off, MIC_WINDOW);
                 wf_silence_count = 0;
             } else {
                 wf_silence_count++;
-                if (wf_silence_count <= WF_SILENCE_PASS) {
-                    vox_stream_feed(wf_stream, mic_buf + off, WF_WINDOW);
+                if (wf_silence_count <= SILENCE_PASS) {
+                    vox_stream_feed(wf_stream, mic_buf + off, MIC_WINDOW);
                 } else if (!wf_was_skipping) {
                     wf_was_skipping = 1;
                     vox_stream_flush(wf_stream);
                 }
             }
-            off += WF_WINDOW;
+            off += MIC_WINDOW;
         }
         if (off < n)
             vox_stream_feed(wf_stream, mic_buf + off, n - off);
@@ -315,7 +323,7 @@ static void *wexproflow_main(void *arg) {
         gettimeofday(&wf_now, NULL);
         double wf_silent_ms = (wf_now.tv_sec  - wf_last_speech_tv.tv_sec)  * 1000.0 +
                               (wf_now.tv_usec - wf_last_speech_tv.tv_usec) / 1000.0;
-        if (wf_heard_speech && wf_silent_ms > a->auto_stop_ms) {
+        if (wf_heard_speech && wf_silent_ms > DICTATE_AUTO_STOP_MS) {
             vox_mic_stop();
             vox_stream_finish(wf_stream);
             wf_drain_tokens();
@@ -517,6 +525,9 @@ int main(int argc, char **argv) {
     vox_ctx_t *ctx = vox_load(model_dir);
     if (!ctx) {
         fprintf(stderr, "Failed to load model from %s\n", model_dir);
+#ifdef USE_METAL
+        vox_metal_shutdown();
+#endif
         return 1;
     }
 
@@ -540,10 +551,6 @@ int main(int argc, char **argv) {
             return 1;
         }
 
-        /* Load config; CLI flags (-I, etc.) override config values */
-        vox_config_t cfg;
-        vox_config_load(&cfg);
-
         struct sigaction sa;
         sa.sa_handler = sigint_handler;
         sa.sa_flags = 0;
@@ -559,10 +566,8 @@ int main(int argc, char **argv) {
 
         struct wf_args args;
         args.ctx              = ctx;
-        args.interval         = (interval > 0) ? interval : cfg.processing_interval;
-        args.silence_threshold = cfg.silence_threshold;
-        args.auto_stop_ms     = (double)cfg.silence_duration_ms;
-        args.sound_enabled    = cfg.sound_enabled;
+        args.interval         = (interval > 0) ? interval : 2.0f;
+        args.sound_enabled    = 1;
 
         fprintf(stderr, "Dictation ready. Option+Space to record, Escape to cancel. Ctrl+C to quit.\n");
 
@@ -614,9 +619,6 @@ int main(int argc, char **argv) {
             fprintf(stderr, "Listening (Ctrl+C to stop)...\n");
 
         /* Silence cancellation state */
-        #define MIC_WINDOW 160          /* 10ms at 16kHz */
-        #define SILENCE_THRESH 0.002f   /* RMS threshold (~-54 dBFS) */
-        #define SILENCE_PASS 60         /* pass-through windows (600ms) */
         float mic_buf[4800]; /* 300ms max read */
         int silence_count = 0;
         int was_skipping = 0; /* were we skipping silence? */
@@ -749,9 +751,10 @@ int main(int argc, char **argv) {
         if (pcm_frames > 0) {
             const int16_t *src = (const int16_t *)(hdr + pcm_offset);
             float fbuf[2048];
-            for (size_t i = 0; i < pcm_frames; i++)
+            size_t count = pcm_frames > 2048 ? 2048 : pcm_frames;
+            for (size_t i = 0; i < count; i++)
                 fbuf[i] = src[i] / 32768.0f;
-            vox_stream_feed(s, fbuf, (int)pcm_frames);
+            vox_stream_feed(s, fbuf, (int)count);
             drain_tokens(s);
         }
 
@@ -761,9 +764,10 @@ int main(int argc, char **argv) {
         while (1) {
             size_t nread = fread(raw_buf, sizeof(int16_t), 4096, stdin);
             if (nread == 0) break;
-            for (size_t i = 0; i < nread; i++)
+            size_t count = nread > 4096 ? 4096 : nread;
+            for (size_t i = 0; i < count; i++)
                 fbuf[i] = raw_buf[i] / 32768.0f;
-            vox_stream_feed(s, fbuf, (int)nread);
+            vox_stream_feed(s, fbuf, (int)count);
             drain_tokens(s);
         }
     } else {
