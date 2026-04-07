@@ -1,7 +1,7 @@
 /*
  * voxtral_hotkey_macos.c - Global hotkey via CGEventTap (macOS)
  *
- * Listens for Option+Space (toggle recording) and Escape (cancel recording)
+ * Listens for Command+R (toggle recording) and Escape (cancel recording)
  * using a session-level event tap. Runs its own CFRunLoop on a background
  * pthread. The user callback must be fast (just set a flag + signal condvar).
  */
@@ -13,7 +13,7 @@
 #include <pthread.h>
 #include <stdio.h>
 
-#define KEYCODE_SPACE  49
+#define KEYCODE_R       15
 #define KEYCODE_ESCAPE 53
 
 static vox_hotkey_cb_t  user_cb;
@@ -45,9 +45,9 @@ static CGEventRef tap_callback(CGEventTapProxy proxy, CGEventType type,
         event, kCGKeyboardEventKeycode);
     CGEventFlags flags = CGEventGetFlags(event);
 
-    /* Option+Space → toggle */
-    if (keycode == KEYCODE_SPACE &&
-        (flags & kCGEventFlagMaskAlternate)) {
+    /* Command+R → toggle */
+    if (keycode == KEYCODE_R &&
+        (flags & kCGEventFlagMaskCommand)) {
         if (user_cb) user_cb(VOX_HOTKEY_TOGGLE);
         return NULL; /* swallow the event */
     }
