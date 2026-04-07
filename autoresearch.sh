@@ -20,7 +20,7 @@ cd "$(dirname "$0")"
 
 BINARY=./voxtral
 MODEL=voxtral-model
-PYTHON=python3
+PYTHON=./venv/bin/python
 EVAL=eval_harness.py
 BASELINE_FILE=bench/baseline_score.txt
 HISTORY_FILE=bench/autoresearch_history.jsonl
