@@ -812,11 +812,21 @@ int main(int argc, char **argv) {
     fputs("\n", stdout);
     fflush(stdout);
 
+    double encoder_ms = 0, decoder_ms = 0;
+    int n_restarts = 0;
+    vox_stream_timing(s, &encoder_ms, &decoder_ms, &n_restarts);
+
     if (json_metrics && json_time_start_ms > 0) {
         double time_final_ms = now_ms();
-        fprintf(stderr, "JSON_METRICS: {\"time_to_first_token_ms\": %.2f, \"time_to_final_ms\": %.2f}\n",
+        fprintf(stderr, "JSON_METRICS: {"
+            "\"time_to_first_token_ms\": %.2f, "
+            "\"time_to_final_ms\": %.2f, "
+            "\"encoder_ms\": %.2f, "
+            "\"decoder_ms\": %.2f, "
+            "\"n_restarts\": %d}\n",
             (json_time_first_token_ms > 0 ? json_time_first_token_ms - json_time_start_ms : 0.0),
-            time_final_ms - json_time_start_ms);
+            time_final_ms - json_time_start_ms,
+            encoder_ms, decoder_ms, n_restarts);
     }
 
     vox_stream_free(s);

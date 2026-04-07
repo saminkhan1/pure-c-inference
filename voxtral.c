@@ -475,6 +475,7 @@ struct vox_stream {
     double prefill_ms;
     int n_generated;
     int n_text_tokens;          /* tokens emitted as visible text */
+    int n_restarts;             /* total decoder restarts (streaming mode) */
 };
 
 typedef enum stream_tok_class {
@@ -1174,6 +1175,7 @@ static void stream_run_decoder(vox_stream_t *s) {
                     full_reset ? "\xe2\x99\xbb" : "\xe2\x9c\x82");
             fflush(stderr);
         }
+        s->n_restarts++;
         if (full_reset) {
             if (stream_reset_full_state(s) != 0) {
                 /* If mel reinit fails, keep live path running with decoder reset. */
@@ -1298,6 +1300,13 @@ int vox_stream_get_alt(vox_stream_t *s, const char **out_tokens,
         s->queue_head = (s->queue_head + 1) % s->queue_cap;
     }
     return count;
+}
+
+void vox_stream_timing(vox_stream_t *s, double *encoder_ms, double *decoder_ms, int *n_restarts) {
+    if (!s) return;
+    if (encoder_ms) *encoder_ms = s->encoder_ms;
+    if (decoder_ms) *decoder_ms = s->decoder_ms;
+    if (n_restarts) *n_restarts = s->n_restarts;
 }
 
 void vox_stream_free(vox_stream_t *s) {

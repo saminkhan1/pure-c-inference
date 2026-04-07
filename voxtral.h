@@ -288,6 +288,9 @@ int vox_stream_flush(vox_stream_t *s);
 /* Free streaming context and all resources. */
 void vox_stream_free(vox_stream_t *s);
 
+/* Get cumulative timing stats (in ms). Fills: encoder_ms, decoder_ms, n_restarts. */
+void vox_stream_timing(vox_stream_t *s, double *encoder_ms, double *decoder_ms, int *n_restarts);
+
 /* ========================================================================
  * Convenience Functions (built on streaming API)
  * ======================================================================== */
