@@ -232,6 +232,22 @@ static void *wexproflow_main(void *arg) {
             vox_stream_set_continuous(wf_stream, 1);
             if (a->interval > 0)
                 vox_set_processing_interval(wf_stream, a->interval);
+
+            /* Pre-warm: feed additional silence to reach STREAM_FIRST_CHUNK_MIN_MEL mel frames
+             * Left pad provides 32*1280=40960 samples (2560ms).
+             * STREAM_FIRST_CHUNK_MIN_MEL=312 frames needs 312*160=49920 samples.
+             * So we only need 49920 - 40960 = 8960 additional samples. */
+            {
+                const int prewarm_samples = 8960;  /* 560ms of silence to reach 3120ms total */
+                float *silence = (float *)calloc((size_t)prewarm_samples, sizeof(float));
+                if (silence) {
+                    vox_stream_feed(wf_stream, silence, prewarm_samples);
+                    free(silence);
+                    /* Drain any tokens generated from silence */
+                    wf_drain_tokens();
+                }
+            }
+
             wf_first_token = 1;
             wf_silence_count = 0;
             wf_was_skipping = 0;
@@ -570,7 +586,7 @@ int main(int argc, char **argv) {
 
         struct wf_args args;
         args.ctx              = ctx;
-        args.interval         = (interval > 0) ? interval : 2.0f;
+        args.interval         = (interval > 0) ? interval : 0.5f;  /* dictation: low latency */
         args.sound_enabled    = 1;
 
         vox_menubar_run(wexproflow_main, &args);
@@ -596,6 +612,9 @@ int main(int argc, char **argv) {
         feed_chunk = (int)(interval * VOX_SAMPLE_RATE);
         if (feed_chunk < 160) feed_chunk = 160;
         if (feed_chunk > DEFAULT_FEED_CHUNK) feed_chunk = DEFAULT_FEED_CHUNK;
+    } else {
+        /* Default: use lower interval for live sources (mic/stdin) */
+        vox_set_processing_interval(s, 0.5f);
     }
 
     /* Enable continuous mode for live sources (auto-restart decoder) */
