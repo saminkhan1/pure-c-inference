@@ -1,0 +1,32 @@
+[
+  {
+    "audio_filepath": "samples/benchmark/night1968/15s_there_are_two_of_them_out_there.wav",
+    "reference_text": "There are two of them out there. Have you seen any more around here? I can take care of those two. I don't know. I don't know. I don't know. What's happening?",
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/night1968/45s_right_through_the_billboard.wav",
+    "reference_text": "We went right through the billboard, ripped over a gas pump, and never stopped moving. By now, it's like a moving bonfire. Didn't know if the truck was going to explode or what. Still, you're the man. Screaming. This thing is just backing away from it. I looked back at the diner to see if there was anyone there who could help me. That was when I noticed that the entire place had been encircled.",
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/night1968/5s_dont_worry_about_him.wav",
+    "reference_text": "Don't worry about him. I can handle him. Probably be a lot more of 'em as soon as they find out about us.",
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/night1968/60s_i_dont_want_anyones_life_on_my_hands.wav",
+    "reference_text": "I don't want anyone's life on my hands. Is there anything I can do? I don't want to hear any more from you, Mister. If you stay up here, you take orders from me, and that includes leaving the girl alone. It's on. It's on. There's no sound. Play with the rabbit ears. Reports, incredible as they seem, are not the results of mass hysteria. Mass hysteria. What do they think we're imagining all this? Shut up! In all parts of the country, the wave of murder which is sweeping the eastern third of the nation is being committed by creatures who feast upon the flesh of their victims. First eyewitness accounts of this grisly development came from people who were understandably frightened and almost incoherent. Officials and newsmen at first discounted those eyewitness descriptions as being beyond belief. However, the reports persisted. Medical examinations of some of the victims bore out the fact that they had been partially devoured.",
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/night1968/89s_ill_come_back_down_as_soon_as.wav",
+    "reference_text": "I heard. I'll come back down as soon as I find out what they want. Thank you, Judy. The body should be disposed of at once, preferably by cremation. Well, how long after death then does the body become reactivated? It's only a matter of minutes. Minutes? Well, that doesn't give people time to make any arrangements. No, you're right. It doesn't give them time to make funeral arrangements. The bodies must be carried to the street and and and burned. They must be burned immediately. Soak them with gasoline and burn them. The bereaved will have to forego the dubious comforts that a funeral service will give. They're just dead flesh and dangerous. I see. Judy, I need you to find some bedspreads or sheets to tear up into small strips. Okay? Is there a fruit cellar here? Yes. We need some bottles or jars to make bottletop cocktails to hold them up while we try to escape. Hey, there's a big can of kerosene down there. I'll see what I can find. I'll look for the bottles. There's a big keyring down there. There may be a key to the gas pump on it. I'll check. We can toss the cocktails from a window upstairs. Meantime, a couple of us can go out and try to get the gas and come back for the rest of the people. But that'll leave a door open someplace. Yeah, that's right. Better be this door. It's closer to the truck. Before we rummage for some supplies behind the cellar door, while we're gone, the rest of you can hold up in there. I found some fruit jars in the cellar, and there's a key on here that's labeled for the gas pump out back.",
+    "dataset": "dictation_micro",
+    "split": "test"
+  }
+]
