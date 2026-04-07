@@ -9,7 +9,7 @@
 #define VOXTRAL_HOTKEY_H
 
 typedef enum {
-    VOX_HOTKEY_TOGGLE,   /* Option+Space: start/stop recording */
+    VOX_HOTKEY_TOGGLE,   /* Command+R: start/stop recording */
     VOX_HOTKEY_CANCEL    /* Escape: cancel current recording */
 } vox_hotkey_event_t;
 

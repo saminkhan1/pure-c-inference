@@ -10,7 +10,7 @@ HuggingFace: `mistralai/Voxtral-Mini-4B-Realtime-2602`
 ```bash
 # Build
 make mps           # Apple Silicon (fastest)
-make wexproflow    # Apple Silicon + Option+Space dictation mode
+make wexproflow    # Apple Silicon + Command+R dictation mode
 make blas          # CPU with BLAS (Accelerate on macOS, OpenBLAS on Linux)
 make clean
 
@@ -31,7 +31,7 @@ make test
 cat audio.wav | ./voxtral -d voxtral-model --stdin
 ffmpeg -i samples/I_have_a_dream.ogg -f s16le -ar 16000 -ac 1 - | ./voxtral -d voxtral-model --stdin
 
-# Dictation mode (Option+Space to record, auto-paste on silence)
+# Dictation mode (Command+R to record, auto-paste on silence)
 ./voxtral -d voxtral-model --dictate                # requires make wexproflow
 
 # Download model (~8.9GB)
@@ -89,7 +89,7 @@ CLI: `--alt <cutoff>` formats output as `[best|alt1|alt2]` when alternatives exi
 
 Built with `make wexproflow`, provides system-wide voice input:
 
-- **Option+Space** to start/stop recording
+- **Command+R** to start/stop recording
 - **Escape** to cancel mid-recording
 - Auto-pastes transcribed text into focused app
 - Menu bar icon shows recording state

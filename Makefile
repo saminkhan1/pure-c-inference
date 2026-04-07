@@ -33,7 +33,7 @@ help:
 ifeq ($(UNAME_S),Darwin)
 ifeq ($(UNAME_M),arm64)
 	@echo "  make mps      - Apple Silicon with Metal GPU (fastest)"
-	@echo "  make wexproflow - MPS + hotkey dictation mode (Option+Space → paste)"
+	@echo "  make wexproflow - MPS + hotkey dictation mode (Command+R → paste)"
 endif
 endif
 	@echo ""
@@ -103,7 +103,7 @@ WEXPROFLOW_LDFLAGS = -framework CoreGraphics -framework ApplicationServices \
 
 wexproflow: clean wexproflow-build
 	@echo ""
-	@echo "Built with MPS backend + dictation mode (Option+Space)"
+	@echo "Built with MPS backend + dictation mode (Command+R)"
 
 main.wexproflow.o: main.c voxtral.h voxtral_kernels.h voxtral_mic.h voxtral_hotkey.h voxtral_paste.h voxtral_menubar.h voxtral_sound.h
 	$(CC) $(WEXPROFLOW_CFLAGS) -c -o $@ $<

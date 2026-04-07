@@ -167,7 +167,7 @@ static void *wexproflow_main(void *arg) {
         return NULL;
     }
 
-    fprintf(stderr, "Dictation ready. Option+Space to record, Escape to cancel. Ctrl+C to quit.\n");
+    fprintf(stderr, "Dictation ready. Command+R to record, Escape to cancel. Ctrl+C to quit.\n");
 
     enum { WF_IDLE, WF_RECORDING } wf_state = WF_IDLE;
     vox_stream_t *wf_stream = NULL;
@@ -282,7 +282,7 @@ static void *wexproflow_main(void *arg) {
         }
 
         if (ev == 1) {
-            /* Option+Space again: stop, flush, paste, log */
+            /* Command+R again: stop, flush, paste, log */
             vox_mic_stop();
             vox_stream_finish(wf_stream);
             wf_drain_tokens();
@@ -390,7 +390,7 @@ static void usage(const char *prog) {
     fprintf(stderr, "  -i <file>     Input WAV file (16-bit PCM, any sample rate)\n");
     fprintf(stderr, "  --stdin       Read audio from stdin (auto-detect WAV or raw s16le 16kHz mono)\n");
     fprintf(stderr, "  --from-mic    Capture from default microphone (macOS only, Ctrl+C to stop)\n");
-    fprintf(stderr, "  --dictate     Hotkey dictation: Option+Space to record, auto-paste on silence\n");
+    fprintf(stderr, "  --dictate     Hotkey dictation: Command+R to record, auto-paste on silence\n");
     fprintf(stderr, "\nOptions:\n");
     fprintf(stderr, "  -I <secs>     Encoder processing interval in seconds (default: 2.0)\n");
     fprintf(stderr, "  --alt <c>     Show alternative tokens within cutoff distance (0.0-1.0)\n");

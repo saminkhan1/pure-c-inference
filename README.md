@@ -13,7 +13,7 @@ Audio processing uses a chunked encoder with overlapping windows, bounding memor
 ```bash
 # Build (choose your backend)
 make mps           # Apple Silicon (fastest)
-make wexproflow    # Apple Silicon + Option+Space dictation mode
+make wexproflow    # Apple Silicon + Command+R dictation mode
 # or: make blas    # Intel Mac / Linux with OpenBLAS
 
 # Download the model (~8.9GB)
@@ -55,7 +55,7 @@ This requires just PyTorch and a few standard libraries.
 - **Streaming C API**: Feed audio incrementally, get token strings back as they become available.
 - **Memory-mapped weights**: BF16 weights are mmap'd directly from safetensors, loading is near-instant.
 - **Live microphone input**: `--from-mic` captures and transcribes from the default microphone (macOS) with automatic silence detection.
-- **Dictation mode**: `--dictate` (Apple Silicon, `make wexproflow`) runs as a background service with a menu bar icon. Option+Space to record anywhere, auto-pastes on silence.
+- **Dictation mode**: `--dictate` (Apple Silicon, `make wexproflow`) runs as a background service with a menu bar icon. Command+R to record anywhere, auto-pastes on silence.
 - **WAV input**: Supports 16-bit PCM WAV files at any sample rate (auto-resampled to 16kHz).
 - **Chunked encoder**: Processes audio in overlapping chunks, bounding memory regardless of length.
 - **Rolling KV cache**: Decoder KV cache is automatically compacted when it exceeds the sliding window (8192 positions), capping memory usage and allowing unlimited-length audio.
@@ -180,7 +180,7 @@ There are two example wave files under the `samples` directory.
 
 ### Dictation Mode (`--dictate`)
 
-Dictation mode turns voxtral into a system-wide background transcription service. Press **Option+Space** anywhere to start recording, pause speaking and it auto-stops, and your transcribed text is pasted directly into the focused application. A menu bar icon shows the current state.
+Dictation mode turns voxtral into a system-wide background transcription service. Press **Command+R** anywhere to start recording, pause speaking and it auto-stops, and your transcribed text is pasted directly into the focused application. A menu bar icon shows the current state.
 
 **Requires Apple Silicon (Metal GPU).** Dictation mode is only available in the `wexproflow` build.
 
@@ -204,7 +204,7 @@ make wexproflow
 make install MODEL_DIR=$(pwd)/voxtral-model
 ```
 
-Once running, the voxtral icon appears in the menu bar. Press **Option+Space** to begin recording (icon fills in, you hear a soft click), then speak. After ~2 seconds of silence the recording stops (another click), and the text is injected into the focused app. Press **Escape** mid-recording to cancel without pasting.
+Once running, the voxtral icon appears in the menu bar. Press **Command+R** to begin recording (icon fills in, you hear a soft click), then speak. After ~2 seconds of silence the recording stops (another click), and the text is injected into the focused app. Press **Escape** mid-recording to cancel without pasting.
 
 #### Permissions
 
@@ -213,7 +213,7 @@ Two permissions are required, both one-time:
 | Permission | Why | Where to grant |
 |-----------|-----|----------------|
 | **Accessibility** | Text injection via CGEvent | System Settings → Privacy & Security → Accessibility |
-| **Input Monitoring** | Global Option+Space hotkey | System Settings → Privacy & Security → Input Monitoring |
+| **Input Monitoring** | Global Command+R hotkey | System Settings → Privacy & Security → Input Monitoring |
 
 After granting, restart voxtral. If either is missing, voxtral prints the exact System Settings path and exits.
 
@@ -398,7 +398,7 @@ sudo dnf install openblas-devel
 
 Other targets:
 ```bash
-make wexproflow                        # Apple Silicon + Option+Space dictation mode
+make wexproflow                        # Apple Silicon + Command+R dictation mode
 make install MODEL_DIR=/path/to/model  # Install binary + launchd login item
 make uninstall                         # Remove launchd agent + binary
 make clean                             # Clean build artifacts
