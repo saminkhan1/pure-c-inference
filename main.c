@@ -8,6 +8,7 @@
 #include "voxtral_kernels.h"
 #include "voxtral_audio.h"
 #include "voxtral_mic.h"
+#include "voxtral_version.h"
 #ifdef WEXPROFLOW
 #include "voxtral_hotkey.h"
 #include "voxtral_paste.h"
@@ -146,6 +147,28 @@ struct wf_args {
 static void *wexproflow_main(void *arg) {
     struct wf_args *a = (struct wf_args *)arg;
 
+    /* Check Accessibility (text injection) permission first.
+     * AXIsProcessTrustedWithOptions prompts the user to open System Settings. */
+    if (!vox_paste_check_access()) {
+        vox_menubar_set_error("Grant Accessibility access:\nSystem Settings → Privacy & Security → Accessibility");
+        /* Stay alive so the menu bar remains visible with the error. */
+        while (!mic_interrupted)
+            usleep(500000);
+        vox_menubar_quit();
+        return NULL;
+    }
+
+    /* Start the global hotkey listener (requires Input Monitoring). */
+    if (vox_hotkey_start(wexproflow_hotkey_cb) != 0) {
+        vox_menubar_set_error("Grant Input Monitoring access:\nSystem Settings → Privacy & Security → Input Monitoring");
+        while (!mic_interrupted)
+            usleep(500000);
+        vox_menubar_quit();
+        return NULL;
+    }
+
+    fprintf(stderr, "Dictation ready. Option+Space to record, Escape to cancel. Ctrl+C to quit.\n");
+
     enum { WF_IDLE, WF_RECORDING } wf_state = WF_IDLE;
     vox_stream_t *wf_stream = NULL;
     int wf_first_token = 1;
@@ -193,17 +216,13 @@ static void *wexproflow_main(void *arg) {
             wf_event = 0;
             pthread_mutex_unlock(&wf_mutex);
 
-            fprintf(stderr, "wf: IDLE event=%d interrupted=%d\n", ev, (int)mic_interrupted);
-
             if (mic_interrupted) break;
             if (ev != 1) continue; /* ignore cancel when idle */
 
-            fprintf(stderr, "wf: starting mic...\n");
             if (vox_mic_start() != 0) {
                 fprintf(stderr, "Error: Failed to start microphone\n");
                 continue;
             }
-            fprintf(stderr, "wf: initializing stream...\n");
             wf_stream = vox_stream_init(a->ctx);
             if (!wf_stream) {
                 fprintf(stderr, "Error: Failed to init stream\n");
@@ -224,7 +243,6 @@ static void *wexproflow_main(void *arg) {
             vox_hotkey_set_recording(1);
             vox_menubar_set_recording(1);
             if (a->sound_enabled) vox_sound_start();
-            fprintf(stderr, "Dictation recording...\n");
             continue;
         }
 
@@ -235,13 +253,8 @@ static void *wexproflow_main(void *arg) {
         wf_event = 0;
         pthread_mutex_unlock(&wf_mutex);
 
-        if (ev != 0) {
-            fprintf(stderr, "wf: RECORDING event=%d\n", ev);
-        }
-
         if (ev == 2) {
             /* Escape: cancel — discard, no history entry */
-            fprintf(stderr, "wf: cancelling...\n");
             vox_mic_stop();
             vox_stream_free(wf_stream);
             wf_stream = NULL;
@@ -249,24 +262,22 @@ static void *wexproflow_main(void *arg) {
             vox_hotkey_set_recording(0);
             vox_menubar_set_recording(0);
             if (a->sound_enabled) vox_sound_stop();
-            fprintf(stderr, "\nCancelled. Option+Space to record again.\n");
             continue;
         }
 
         if (ev == 1) {
             /* Option+Space again: stop, flush, paste, log */
-            fprintf(stderr, "wf: finishing...\n");
             vox_mic_stop();
             vox_stream_finish(wf_stream);
             wf_drain_tokens();
             history_append(wf_text_buf);
+            vox_menubar_set_last_text(wf_text_buf);
             vox_stream_free(wf_stream);
             wf_stream = NULL;
             wf_state = WF_IDLE;
             vox_hotkey_set_recording(0);
             vox_menubar_set_recording(0);
             if (a->sound_enabled) vox_sound_stop();
-            fprintf(stderr, "\nDone. Option+Space to record again.\n");
             continue;
         }
 
@@ -328,6 +339,7 @@ static void *wexproflow_main(void *arg) {
             vox_stream_finish(wf_stream);
             wf_drain_tokens();
             history_append(wf_text_buf);
+            vox_menubar_set_last_text(wf_text_buf);
             vox_stream_free(wf_stream);
             wf_stream = NULL;
             wf_state = WF_IDLE;
@@ -335,7 +347,6 @@ static void *wexproflow_main(void *arg) {
             vox_menubar_set_recording(0);
             if (a->sound_enabled) vox_sound_stop();
             wf_heard_speech = 0;
-            fprintf(stderr, "\nDone. Option+Space to record again.\n");
             continue;
         }
 
@@ -356,7 +367,7 @@ static void *wexproflow_main(void *arg) {
 #endif /* WEXPROFLOW */
 
 static void usage(const char *prog) {
-    fprintf(stderr, "voxtral.c — Voxtral Realtime 4B speech-to-text\n\n");
+    fprintf(stderr, "voxtral v" VOXTRAL_VERSION " — Voxtral Realtime 4B speech-to-text\n\n");
     fprintf(stderr, "Usage: %s -d <model_dir> (-i <input.wav> | --stdin | --from-mic) [options]\n\n", prog);
     fprintf(stderr, "Required:\n");
     fprintf(stderr, "  -d <dir>      Model directory (with consolidated.safetensors, tekken.json)\n");
@@ -370,6 +381,7 @@ static void usage(const char *prog) {
     fprintf(stderr, "  --monitor     Show non-intrusive symbols inline with output (stderr)\n");
     fprintf(stderr, "  --debug       Debug output (per-layer, per-chunk details)\n");
     fprintf(stderr, "  --silent      No status output (only transcription on stdout)\n");
+    fprintf(stderr, "  --version     Show version and exit\n");
     fprintf(stderr, "  -h            Show this help\n");
 }
 
@@ -495,6 +507,9 @@ int main(int argc, char **argv) {
             verbosity = 0;
         } else if (strcmp(argv[i], "--json-metrics") == 0) {
             json_metrics = 1;
+        } else if (strcmp(argv[i], "--version") == 0) {
+            printf("voxtral v" VOXTRAL_VERSION "\n");
+            return 0;
         } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
             usage(argv[0]);
             return 0;
@@ -541,11 +556,6 @@ int main(int argc, char **argv) {
         vox_free(ctx);
         return 1;
 #else
-        if (!vox_paste_check_access()) {
-            vox_free(ctx);
-            return 1;
-        }
-
         if (pid_lock_acquire() != 0) {
             vox_free(ctx);
             return 1;
@@ -558,18 +568,10 @@ int main(int argc, char **argv) {
         sigaction(SIGINT, &sa, NULL);
         sigaction(SIGTERM, &sa, NULL);
 
-        if (vox_hotkey_start(wexproflow_hotkey_cb) != 0) {
-            pid_lock_release();
-            vox_free(ctx);
-            return 1;
-        }
-
         struct wf_args args;
         args.ctx              = ctx;
         args.interval         = (interval > 0) ? interval : 2.0f;
         args.sound_enabled    = 1;
-
-        fprintf(stderr, "Dictation ready. Option+Space to record, Escape to cancel. Ctrl+C to quit.\n");
 
         vox_menubar_run(wexproflow_main, &args);
 

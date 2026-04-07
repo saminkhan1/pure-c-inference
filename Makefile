@@ -1,6 +1,8 @@
 # voxtral.c — Voxtral Realtime 4B Pure C Inference Engine
 # Makefile
 
+VOXTRAL_VERSION = 0.1.0-beta
+
 CC = gcc
 CFLAGS_BASE = -Wall -Wextra -O3 -march=native -ffast-math
 LDFLAGS = -lm
@@ -18,7 +20,7 @@ TARGET = voxtral
 # Debug build flags
 DEBUG_CFLAGS = -Wall -Wextra -g -O0 -DDEBUG -fsanitize=address
 
-.PHONY: all clean debug info help blas mps wexproflow inspect test install uninstall
+.PHONY: all clean debug info help blas mps wexproflow inspect test install install-beta uninstall app dmg
 
 # Default: show available targets
 all: help
@@ -42,6 +44,9 @@ endif
 	@echo "  make info     - Show build configuration"
 	@echo "  make install MODEL_DIR=/path  - Install + register launchd agent (auto-start on login)"
 	@echo "  make uninstall               - Unregister launchd agent and remove binary"
+	@echo "  make app            - Create Voxtral.app bundle (requires prior wexproflow build)"
+	@echo "  make install-beta MODEL_DIR=/path - Install app + launchd (no Apple ID needed)"
+	@echo "  make dmg            - Create Voxtral-<version>.dmg for sharing (requires app)"
 	@echo ""
 	@echo "Example: make blas && ./voxtral -d voxtral-model -i audio.wav"
 
@@ -164,6 +169,7 @@ uninstall:
 	-launchctl bootout gui/$$(id -u)/$(PLIST_NAME) 2>/dev/null || true
 	-rm -f $(PLIST_DEST)
 	-rm -f $(INSTALL_BIN)
+	-rm -rf $(APP_INSTALL)
 	@echo "Uninstalled."
 
 # =============================================================================
@@ -185,11 +191,100 @@ test-mic:
 endif
 
 # =============================================================================
+# App bundle + distribution (no paid Apple Developer account required)
+#
+# Gatekeeper strategy for free accounts:
+#   - Ad-hoc signing (codesign --sign -) is enough to satisfy macOS entitlements
+#     for Metal JIT and microphone access.
+#   - The quarantine xattr is what Gatekeeper actually checks. Removing it with
+#     xattr -rd com.apple.quarantine lets the app run without any warning.
+#   - make install-beta does both automatically — no Apple ID needed.
+#   - curl downloads (not browser downloads) never get the quarantine flag,
+#     so terminal-based installs work out of the box.
+# =============================================================================
+APP_NAME    = Voxtral
+APP_BUNDLE  = $(APP_NAME).app
+APP_INSTALL = /Applications/$(APP_BUNDLE)
+DMG_NAME    = $(APP_NAME)-$(VOXTRAL_VERSION).dmg
+DMG_STAGING = _dmg_staging
+
+# Build the .app bundle and ad-hoc sign it.
+# Ad-hoc signing (-) uses a local certificate — no Apple Developer ID needed.
+# It is required so the entitlements (Metal JIT, microphone) take effect.
+app:
+	@[ -f $(TARGET) ] || (echo "Error: run 'make wexproflow' first" && exit 1)
+	@rm -rf $(APP_BUNDLE)
+	@mkdir -p $(APP_BUNDLE)/Contents/MacOS
+	@mkdir -p $(APP_BUNDLE)/Contents/Resources
+	cp $(TARGET) $(APP_BUNDLE)/Contents/MacOS/$(TARGET)
+	sed -e "s|__VOXTRAL_VERSION__|$(VOXTRAL_VERSION)|g" \
+	    Info.plist > $(APP_BUNDLE)/Contents/Info.plist
+	codesign --sign - --force --options runtime \
+	    --entitlements voxtral.entitlements $(APP_BUNDLE)
+	@echo "Created and ad-hoc signed $(APP_BUNDLE)"
+
+# Install to /Applications + register launchd agent.
+# No Apple Developer ID required.
+# Usage: make install-beta MODEL_DIR=/path/to/voxtral-model
+install-beta: app
+	@[ -n "$(MODEL_DIR)" ] || (echo "Error: specify MODEL_DIR, e.g. make install-beta MODEL_DIR=$$HOME/voxtral-model" && exit 1)
+	@plutil -lint $(PLIST_NAME).plist || (echo "Error: plist validation failed" && exit 1)
+	# Remove existing installation gracefully
+	-launchctl bootout gui/$$(id -u)/$(PLIST_NAME) 2>/dev/null || true
+	-rm -rf $(APP_INSTALL)
+	cp -r $(APP_BUNDLE) /Applications/
+	# Strip the quarantine flag — this is what Gatekeeper checks.
+	# Safe to do: we built this binary ourselves on this machine.
+	xattr -rd com.apple.quarantine $(APP_INSTALL) 2>/dev/null || true
+	# Register launchd agent (starts on login, restarts on crash)
+	mkdir -p $(HOME)/.config/voxtral
+	sed -e "s|__VOXTRAL_BIN__|$(APP_INSTALL)/Contents/MacOS/$(TARGET)|g" \
+	    -e "s|__MODEL_DIR__|$(MODEL_DIR)|g" \
+	    -e "s|__HOME__|$(HOME)|g" \
+	    $(PLIST_NAME).plist > $(PLIST_DEST)
+	launchctl bootstrap gui/$$(id -u) $(PLIST_DEST)
+	@echo ""
+	@echo "Installed Voxtral $(VOXTRAL_VERSION) to /Applications"
+	@echo "Starts automatically on login. Running now."
+	@echo "Logs: $(HOME)/.config/voxtral/voxtral.log"
+
+# Create a DMG for sharing with beta users.
+# Include a README so users know how to install without a paid Developer ID.
+# Requires: brew install create-dmg
+dmg: app
+	@which create-dmg >/dev/null 2>&1 || \
+	    (echo "Error: 'create-dmg' not found. Install with: brew install create-dmg" && exit 1)
+	@rm -rf $(DMG_STAGING) $(DMG_NAME)
+	@mkdir -p "$(DMG_STAGING)"
+	cp -r $(APP_BUNDLE) "$(DMG_STAGING)/"
+	@printf 'Voxtral %s — Install Instructions\n\n1. Drag Voxtral.app to your Applications folder.\n\n2. Open Terminal and run:\n   xattr -rd com.apple.quarantine /Applications/Voxtral.app\n\n3. Set your model path in the launchd agent:\n   make install-beta MODEL_DIR=$$HOME/voxtral-model\n\nAll transcription is on-device. Nothing leaves your Mac.\n' \
+	    "$(VOXTRAL_VERSION)" > "$(DMG_STAGING)/Install Instructions.txt"
+	create-dmg \
+	    --volname "$(APP_NAME) $(VOXTRAL_VERSION)" \
+	    --window-size 620 420 \
+	    --icon-size 128 \
+	    --icon "$(APP_BUNDLE)" 150 220 \
+	    --app-drop-link 460 220 \
+	    --hide-extension "$(APP_BUNDLE)" \
+	    $(DMG_NAME) \
+	    "$(DMG_STAGING)/"
+	@rm -rf $(DMG_STAGING)
+	@echo ""
+	@echo "Created $(DMG_NAME)"
+	@echo ""
+	@echo "Beta install instructions for users (include in release notes):"
+	@echo "  1. Download $(DMG_NAME)"
+	@echo "  2. Drag Voxtral.app to /Applications"
+	@echo "  3. In Terminal: xattr -rd com.apple.quarantine /Applications/Voxtral.app"
+	@echo "  4. make install-beta MODEL_DIR=/path/to/voxtral-model"
+
+# =============================================================================
 # Utilities
 # =============================================================================
 clean:
 	rm -f $(OBJS) *.mps.o *.wexproflow.o voxtral_metal.o main.o inspect_weights.o $(TARGET) inspect_weights
 	rm -f voxtral_shaders_source.h voxtral_menubar.wexproflow.o
+	rm -rf $(APP_BUNDLE) _dmg_staging $(APP_NAME)-*.dmg
 
 info:
 	@echo "Platform: $(UNAME_S) $(UNAME_M)"

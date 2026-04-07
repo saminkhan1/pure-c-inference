@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.voxtral.dictation</string>
+
+    <key>CFBundleName</key>
+    <string>Voxtral</string>
+
+    <key>CFBundleDisplayName</key>
+    <string>Voxtral</string>
+
+    <key>CFBundleExecutable</key>
+    <string>voxtral</string>
+
+    <key>CFBundleVersion</key>
+    <string>__VOXTRAL_VERSION__</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>__VOXTRAL_VERSION__</string>
+
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <key>CFBundleSignature</key>
+    <string>????</string>
+
+    <key>LSMinimumSystemVersion</key>
+    <string>13.0</string>
+
+    <key>LSUIElement</key>
+    <true/>
+
+    <!-- Required: prompts the microphone permission dialog on first use -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Voxtral uses the microphone to transcribe your speech on-device.</string>
+
+    <!-- Required: needed to inject keystrokes into other apps -->
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Voxtral needs Accessibility access to paste transcribed text into other apps.</string>
+
+    <key>NSHighResolutionCapable</key>
+    <true/>
+</dict>
+</plist>
