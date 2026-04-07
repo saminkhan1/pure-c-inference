@@ -1,28 +1,22 @@
 /*
  * voxtral_menubar.m - Menu bar status item (macOS)
  *
- * Minimal Objective-C: NSStatusItem with programmatic template images.
+ * Minimal menu bar app using GCD for concurrency and SF Symbols for icons.
  * Two states: idle (outline mic) and recording (filled mic).
- * NSApplication runs on main thread, worker runs on background pthread.
  */
 
 #ifdef __APPLE__
 
 #import <Cocoa/Cocoa.h>
 #include "voxtral_menubar.h"
-#include <pthread.h>
+#import <dispatch/dispatch.h>
 
-/* Shared state with main.c wexproflow worker */
-extern int mic_interrupted; /* plain int, accessed via __atomic built-ins */
-extern pthread_mutex_t wf_mutex;
-extern pthread_cond_t  wf_cond;
-
-/* ---- App delegate ---- */
+static dispatch_queue_t g_work_queue;
+static dispatch_semaphore_t g_quit_sem;
+static BOOL g_is_recording = NO;
 
 @interface VoxtralDelegate : NSObject <NSApplicationDelegate>
 @property (strong) NSStatusItem *statusItem;
-@property (strong) NSImage *idleImage;
-@property (strong) NSImage *recordImage;
 @end
 
 @implementation VoxtralDelegate
@@ -31,62 +25,23 @@ extern pthread_cond_t  wf_cond;
     (void)notification;
 
     self.statusItem = [[NSStatusBar systemStatusBar]
-        statusItemWithLength:NSSquareStatusItemLength];
+        statusItemWithLength:NSVariableStatusItemLength];
 
-    /* Draw mic icons programmatically (template images, no assets) */
-    self.idleImage = [self drawMicIcon:NO];
-    self.recordImage = [self drawMicIcon:YES];
-    self.statusItem.button.image = self.idleImage;
-    self.statusItem.button.accessibilityLabel = @"Voxtral Dictation";
-    self.statusItem.button.accessibilityHelp = @"Press Option+Space to start dictation";
+    NSImage *micImage = [NSImage imageWithSystemSymbolName:@"mic"
+                                   accessibilityDescription:@"Voxtral Dictation"];
+    NSImageSymbolConfiguration *config = [NSImageSymbolConfiguration configurationWithPointSize:16 weight:NSFontWeightMedium];
+    self.statusItem.button.image = [micImage imageWithSymbolConfiguration:config];
     self.statusItem.button.toolTip = @"Voxtral Dictation - Idle";
 
-    /* Menu */
     NSMenu *menu = [[NSMenu alloc] init];
-    [menu addItemWithTitle:@"Voxtral Dictation"
-                    action:nil keyEquivalent:@""];
+    [menu addItemWithTitle:@"Voxtral Dictation" action:nil keyEquivalent:@""];
     [menu addItem:[NSMenuItem separatorItem]];
-    [menu addItemWithTitle:@"Quit Voxtral"
-                    action:@selector(quitApp:) keyEquivalent:@"q"];
-    [[menu itemAtIndex:2] setTarget:self];
+    NSMenuItem *quitItem = [[NSMenuItem alloc] initWithTitle:@"Quit Voxtral"
+                                                       action:@selector(quitApp:)
+                                                keyEquivalent:@"q"];
+    quitItem.target = self;
+    [menu addItem:quitItem];
     self.statusItem.menu = menu;
-}
-
-- (NSImage *)drawMicIcon:(BOOL)filled {
-    NSImage *img = [[NSImage alloc] initWithSize:NSMakeSize(16, 16)];
-    [img lockFocus];
-
-    NSBezierPath *body = [NSBezierPath bezierPathWithRoundedRect:
-        NSMakeRect(5.5, 5, 5, 7) xRadius:2.5 yRadius:2.5];
-    if (filled) {
-        [[NSColor labelColor] setFill];
-        [body fill];
-    } else {
-        [[NSColor labelColor] setStroke];
-        [body setLineWidth:1.2];
-        [body stroke];
-    }
-
-    NSBezierPath *stand = [NSBezierPath bezierPath];
-    [stand moveToPoint:NSMakePoint(3.5, 8)];
-    [stand curveToPoint:NSMakePoint(12.5, 8)
-          controlPoint1:NSMakePoint(3.5, 2.5)
-          controlPoint2:NSMakePoint(12.5, 2.5)];
-    [[NSColor labelColor] setStroke];
-    [stand setLineWidth:1.2];
-    [stand stroke];
-
-    NSBezierPath *base = [NSBezierPath bezierPath];
-    [base moveToPoint:NSMakePoint(8, 2.5)];
-    [base lineToPoint:NSMakePoint(8, 1)];
-    [base moveToPoint:NSMakePoint(5.5, 1)];
-    [base lineToPoint:NSMakePoint(10.5, 1)];
-    [base setLineWidth:1.2];
-    [base stroke];
-
-    [img unlockFocus];
-    [img setTemplate:YES];
-    return img;
 }
 
 - (void)quitApp:(id)sender {
@@ -96,84 +51,66 @@ extern pthread_cond_t  wf_cond;
 
 @end
 
-/* ---- C API ---- */
-
-static VoxtralDelegate *g_delegate = nil;
-static pthread_t g_worker_thread;
-
-struct worker_args {
-    vox_worker_fn fn;
-    void *data;
-};
-
-static void *worker_wrapper(void *arg) {
-    struct worker_args *wa = (struct worker_args *)arg;
-    void *result = wa->fn(wa->data);
-    free(wa);
-    /* Worker finished — quit the app */
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSApp terminate:nil];
-    });
-    return result;
-}
-
 int vox_menubar_run(vox_worker_fn worker_fn, void *user_data) {
     @autoreleasepool {
+        g_quit_sem = dispatch_semaphore_create(0);
+        g_work_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+
         [NSApplication sharedApplication];
         [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
+        [NSApp setDelegate:[[VoxtralDelegate alloc] init]];
 
-        g_delegate = [[VoxtralDelegate alloc] init];
-        [NSApp setDelegate:g_delegate];
+        dispatch_async(g_work_queue, ^{
+            worker_fn(user_data);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSApp terminate:nil];
+            });
+        });
 
-        /* Spawn worker on background thread */
-        struct worker_args *wa = malloc(sizeof(*wa));
-        wa->fn = worker_fn;
-        wa->data = user_data;
-        pthread_create(&g_worker_thread, NULL, worker_wrapper, wa);
-
-        /* Run NSApplication (blocks until termination) */
         [NSApp run];
-
-        pthread_join(g_worker_thread, NULL);
     }
     return 0;
 }
 
 void vox_menubar_set_recording(int active) {
-    if (!g_delegate) return;
+    g_is_recording = active;
     dispatch_async(dispatch_get_main_queue(), ^{
-        g_delegate.statusItem.button.image =
-            active ? g_delegate.recordImage : g_delegate.idleImage;
-        g_delegate.statusItem.button.toolTip =
-            active ? @"Voxtral Dictation - Recording..." : @"Voxtral Dictation - Idle";
+        NSStatusItem *item = [(VoxtralDelegate *)NSApp.delegate statusItem];
+        NSString *symbolName = active ? @"mic.fill" : @"mic";
+        NSImage *img = [NSImage imageWithSystemSymbolName:symbolName
+                                  accessibilityDescription:@"Voxtral Dictation"];
+        NSImageSymbolConfiguration *config = [NSImageSymbolConfiguration configurationWithPointSize:16 weight:NSFontWeightMedium];
+        item.button.image = [img imageWithSymbolConfiguration:config];
+        item.button.toolTip = active ? @"Voxtral Dictation - Recording..." : @"Voxtral Dictation - Idle";
     });
 }
 
 void vox_menubar_quit(void) {
-    /* Signal the wexproflow thread to exit */
-    __atomic_store_n(&mic_interrupted, 1, __ATOMIC_SEQ_CST);
-    pthread_mutex_lock(&wf_mutex);
-    pthread_cond_signal(&wf_cond);
-    pthread_mutex_unlock(&wf_mutex);
-    /* Also stop NSApp directly so the menu bar disappears immediately,
-     * rather than waiting for the worker to finish its current inference. */
+    dispatch_semaphore_signal(g_quit_sem);
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSApp terminate:nil];
     });
 }
 
-#else /* !__APPLE__ */
+int vox_menubar_wait_for_quit(void) {
+    return dispatch_semaphore_wait(g_quit_sem, DISPATCH_TIME_FOREVER);
+}
+
+#else
 
 #include "voxtral_menubar.h"
 #include <stdio.h>
 
+static dispatch_semaphore_t g_quit_sem;
+
 int vox_menubar_run(vox_worker_fn worker_fn, void *user_data) {
-    /* No menu bar on non-macOS — just run worker directly */
+    g_quit_sem = dispatch_semaphore_create(0);
     worker_fn(user_data);
     return 0;
 }
 
 void vox_menubar_set_recording(int active) { (void)active; }
-void vox_menubar_quit(void) {}
+void vox_menubar_quit(void) { dispatch_semaphore_signal(g_quit_sem); }
+int vox_menubar_wait_for_quit(void) { return dispatch_semaphore_wait(g_quit_sem, DISPATCH_TIME_FOREVER); }
 
 #endif
