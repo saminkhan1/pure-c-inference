@@ -1,318 +1,62 @@
 [
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0000.wav",
-    "reference_text": "CONCORD RETURNED TO ITS PLACE AMIDST THE TENTS",
-    "normalized_text": "CONCORD RETURNED TO ITS PLACE AMIDST THE TENTS",
-    "duration": 3.505,
+    "reference_text": "I HAD SCARCELY KNOWN WHAT I HAD BEEN SAYING OR DOING UP TO THIS TIME BUT AS HE SPOKE I LOOKED AT MY HAND",
+    "normalized_text": "I HAD SCARCELY KNOWN WHAT I HAD BEEN SAYING OR DOING UP TO THIS TIME BUT AS HE SPOKE I LOOKED AT MY HAND",
+    "duration": 7.325,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0001.wav",
-    "reference_text": "THE ENGLISH FORWARDED TO THE FRENCH BASKETS OF FLOWERS OF WHICH THEY HAD MADE A PLENTIFUL PROVISION TO GREET THE ARRIVAL OF THE YOUNG PRINCESS THE FRENCH IN RETURN INVITED THE ENGLISH TO A SUPPER WHICH WAS TO BE GIVEN THE NEXT DAY",
-    "normalized_text": "THE ENGLISH FORWARDED TO THE FRENCH BASKETS OF FLOWERS OF WHICH THEY HAD MADE A PLENTIFUL PROVISION TO GREET THE ARRIVAL OF THE YOUNG PRINCESS THE FRENCH IN RETURN INVITED THE ENGLISH TO A SUPPER WHICH WAS TO BE GIVEN THE NEXT DAY",
-    "duration": 14.225,
+    "reference_text": "A CIRCLE OF A FEW HUNDRED FEET IN CIRCUMFERENCE WAS DRAWN AND EACH OF THE PARTY TOOK A SEGMENT FOR HIS PORTION",
+    "normalized_text": "A CIRCLE OF A FEW HUNDRED FEET IN CIRCUMFERENCE WAS DRAWN AND EACH OF THE PARTY TOOK A SEGMENT FOR HIS PORTION",
+    "duration": 6.55,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0002.wav",
-    "reference_text": "CONGRATULATIONS WERE POURED IN UPON THE PRINCESS EVERYWHERE DURING HER JOURNEY",
-    "normalized_text": "CONGRATULATIONS WERE POURED IN UPON THE PRINCESS EVERYWHERE DURING HER JOURNEY",
-    "duration": 5.025,
+    "reference_text": "BRAVELY AND GENEROUSLY HAS HE BATTLED IN MY BEHALF AND THIS AND MORE WILL I DARE IN HIS SERVICE",
+    "normalized_text": "BRAVELY AND GENEROUSLY HAS HE BATTLED IN MY BEHALF AND THIS AND MORE WILL I DARE IN HIS SERVICE",
+    "duration": 6.285,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0003.wav",
-    "reference_text": "FROM THE RESPECT PAID HER ON ALL SIDES SHE SEEMED LIKE A QUEEN AND FROM THE ADORATION WITH WHICH SHE WAS TREATED BY TWO OR THREE SHE APPEARED AN OBJECT OF WORSHIP THE QUEEN MOTHER GAVE THE FRENCH THE MOST AFFECTIONATE RECEPTION FRANCE WAS HER NATIVE COUNTRY AND SHE HAD SUFFERED TOO MUCH UNHAPPINESS IN ENGLAND FOR ENGLAND TO HAVE MADE HER FORGET FRANCE",
-    "normalized_text": "FROM THE RESPECT PAID HER ON ALL SIDES SHE SEEMED LIKE A QUEEN AND FROM THE ADORATION WITH WHICH SHE WAS TREATED BY TWO OR THREE SHE APPEARED AN OBJECT OF WORSHIP THE QUEEN MOTHER GAVE THE FRENCH THE MOST AFFECTIONATE RECEPTION FRANCE WAS HER NATIVE COUNTRY AND SHE HAD SUFFERED TOO MUCH UNHAPPINESS IN ENGLAND FOR ENGLAND TO HAVE MADE HER FORGET FRANCE",
-    "duration": 23.315,
+    "reference_text": "THE EXAMINATION HOWEVER RESULTED IN NO DISCOVERY",
+    "normalized_text": "THE EXAMINATION HOWEVER RESULTED IN NO DISCOVERY",
+    "duration": 3.515,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0004.wav",
-    "reference_text": "SHE TAUGHT HER DAUGHTER THEN BY HER OWN AFFECTION FOR IT THAT LOVE FOR A COUNTRY WHERE THEY HAD BOTH BEEN HOSPITABLY RECEIVED AND WHERE A BRILLIANT FUTURE OPENED BEFORE THEM",
-    "normalized_text": "SHE TAUGHT HER DAUGHTER THEN BY HER OWN AFFECTION FOR IT THAT LOVE FOR A COUNTRY WHERE THEY HAD BOTH BEEN HOSPITABLY RECEIVED AND WHERE A BRILLIANT FUTURE OPENED BEFORE THEM",
-    "duration": 11.065,
+    "reference_text": "MY POSITION WAS TOO TERRIBLE",
+    "normalized_text": "MY POSITION WAS TOO TERRIBLE",
+    "duration": 2.53,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0005.wav",
-    "reference_text": "THE COUNT HAD THROWN HIMSELF BACK ON HIS SEAT LEANING HIS SHOULDERS AGAINST THE PARTITION OF THE TENT AND REMAINED THUS HIS FACE BURIED IN HIS HANDS WITH HEAVING CHEST AND RESTLESS LIMBS",
-    "normalized_text": "THE COUNT HAD THROWN HIMSELF BACK ON HIS SEAT LEANING HIS SHOULDERS AGAINST THE PARTITION OF THE TENT AND REMAINED THUS HIS FACE BURIED IN HIS HANDS WITH HEAVING CHEST AND RESTLESS LIMBS",
-    "duration": 13.16,
+    "reference_text": "A FEELING OF FREEDOM AND I WAS AWAKE WHERE",
+    "normalized_text": "A FEELING OF FREEDOM AND I WAS AWAKE WHERE",
+    "duration": 4.7,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0006.wav",
-    "reference_text": "THIS HAS INDEED BEEN A HARASSING DAY CONTINUED THE YOUNG MAN HIS EYES FIXED UPON HIS FRIEND",
-    "normalized_text": "THIS HAS INDEED BEEN A HARASSING DAY CONTINUED THE YOUNG MAN HIS EYES FIXED UPON HIS FRIEND",
-    "duration": 5.85,
+    "reference_text": "SEE SAID UNCAS POINTING NORTH AND SOUTH AT THE EVIDENT MARKS OF THE BROAD TRAIL ON EITHER SIDE OF HIM THE DARK HAIR HAS GONE TOWARD THE FOREST",
+    "normalized_text": "SEE SAID UNCAS POINTING NORTH AND SOUTH AT THE EVIDENT MARKS OF THE BROAD TRAIL ON EITHER SIDE OF HIM THE DARK HAIR HAS GONE TOWARD THE FOREST",
+    "duration": 10.195,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0007.wav",
-    "reference_text": "YOU WILL BE FRANK WITH ME I ALWAYS AM",
-    "normalized_text": "YOU WILL BE FRANK WITH ME I ALWAYS AM",
-    "duration": 3.315,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0008.wav",
-    "reference_text": "CAN YOU IMAGINE WHY BUCKINGHAM HAS BEEN SO VIOLENT I SUSPECT",
-    "normalized_text": "CAN YOU IMAGINE WHY BUCKINGHAM HAS BEEN SO VIOLENT I SUSPECT",
-    "duration": 4.785,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0009.wav",
-    "reference_text": "IT IS YOU WHO ARE MISTAKEN RAOUL I HAVE READ HIS DISTRESS IN HIS EYES IN HIS EVERY GESTURE AND ACTION THE WHOLE DAY",
-    "normalized_text": "IT IS YOU WHO ARE MISTAKEN RAOUL I HAVE READ HIS DISTRESS IN HIS EYES IN HIS EVERY GESTURE AND ACTION THE WHOLE DAY",
-    "duration": 7.28,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0010.wav",
-    "reference_text": "I CAN PERCEIVE LOVE CLEARLY ENOUGH",
-    "normalized_text": "I CAN PERCEIVE LOVE CLEARLY ENOUGH",
-    "duration": 3.035,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0011.wav",
-    "reference_text": "I AM CONVINCED OF WHAT I SAY SAID THE COUNT",
-    "normalized_text": "I AM CONVINCED OF WHAT I SAY SAID THE COUNT",
-    "duration": 3.195,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0012.wav",
-    "reference_text": "IT IS ANNOYANCE THEN",
-    "normalized_text": "IT IS ANNOYANCE THEN",
-    "duration": 1.94,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0013.wav",
-    "reference_text": "IN THOSE VERY TERMS I EVEN ADDED MORE",
-    "normalized_text": "IN THOSE VERY TERMS I EVEN ADDED MORE",
-    "duration": 2.94,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0014.wav",
-    "reference_text": "BUT CONTINUED RAOUL NOT INTERRUPTED BY THIS MOVEMENT OF HIS FRIEND HEAVEN BE PRAISED THE FRENCH WHO ARE PRONOUNCED TO BE THOUGHTLESS AND INDISCREET RECKLESS EVEN ARE CAPABLE OF BRINGING A CALM AND SOUND JUDGMENT TO BEAR ON MATTERS OF SUCH HIGH IMPORTANCE",
-    "normalized_text": "BUT CONTINUED RAOUL NOT INTERRUPTED BY THIS MOVEMENT OF HIS FRIEND HEAVEN BE PRAISED THE FRENCH WHO ARE PRONOUNCED TO BE THOUGHTLESS AND INDISCREET RECKLESS EVEN ARE CAPABLE OF BRINGING A CALM AND SOUND JUDGMENT TO BEAR ON MATTERS OF SUCH HIGH IMPORTANCE",
-    "duration": 16.84,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0015.wav",
-    "reference_text": "THUS IT IS THAT THE HONOR OF THREE IS SAVED OUR COUNTRY'S OUR MASTER'S AND OUR OWN",
-    "normalized_text": "THUS IT IS THAT THE HONOR OF THREE IS SAVED OUR COUNTRY'S OUR MASTER'S AND OUR OWN",
-    "duration": 6.38,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0016.wav",
-    "reference_text": "YES I NEED REPOSE MANY THINGS HAVE AGITATED ME TO DAY BOTH IN MIND AND BODY WHEN YOU RETURN TO MORROW I SHALL NO LONGER BE THE SAME MAN",
-    "normalized_text": "YES I NEED REPOSE MANY THINGS HAVE AGITATED ME TO DAY BOTH IN MIND AND BODY WHEN YOU RETURN TO MORROW I SHALL NO LONGER BE THE SAME MAN",
-    "duration": 10.015,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0017.wav",
-    "reference_text": "BUT IN THIS FRIENDLY PRESSURE RAOUL COULD DETECT THE NERVOUS AGITATION OF A GREAT INTERNAL CONFLICT",
-    "normalized_text": "BUT IN THIS FRIENDLY PRESSURE RAOUL COULD DETECT THE NERVOUS AGITATION OF A GREAT INTERNAL CONFLICT",
-    "duration": 6.16,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0018.wav",
-    "reference_text": "THE NIGHT WAS CLEAR STARLIT AND SPLENDID THE TEMPEST HAD PASSED AWAY AND THE SWEET INFLUENCES OF THE EVENING HAD RESTORED LIFE PEACE AND SECURITY EVERYWHERE",
-    "normalized_text": "THE NIGHT WAS CLEAR STARLIT AND SPLENDID THE TEMPEST HAD PASSED AWAY AND THE SWEET INFLUENCES OF THE EVENING HAD RESTORED LIFE PEACE AND SECURITY EVERYWHERE",
-    "duration": 10.81,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0019.wav",
-    "reference_text": "UPON THE LARGE SQUARE IN FRONT OF THE HOTEL THE SHADOWS OF THE TENTS INTERSECTED BY THE GOLDEN MOONBEAMS FORMED AS IT WERE A HUGE MOSAIC OF JET AND YELLOW FLAGSTONES",
-    "normalized_text": "UPON THE LARGE SQUARE IN FRONT OF THE HOTEL THE SHADOWS OF THE TENTS INTERSECTED BY THE GOLDEN MOONBEAMS FORMED AS IT WERE A HUGE MOSAIC OF JET AND YELLOW FLAGSTONES",
-    "duration": 11.6450625,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0020.wav",
-    "reference_text": "BRAGELONNE WATCHED FOR SOME TIME THE CONDUCT OF THE TWO LOVERS LISTENED TO THE LOUD AND UNCIVIL SLUMBERS OF MANICAMP WHO SNORED AS IMPERIOUSLY AS THOUGH HE WAS WEARING HIS BLUE AND GOLD INSTEAD OF HIS VIOLET SUIT",
-    "normalized_text": "BRAGELONNE WATCHED FOR SOME TIME THE CONDUCT OF THE TWO LOVERS LISTENED TO THE LOUD AND UNCIVIL SLUMBERS OF MANICAMP WHO SNORED AS IMPERIOUSLY AS THOUGH HE WAS WEARING HIS BLUE AND GOLD INSTEAD OF HIS VIOLET SUIT",
-    "duration": 14.4,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0021.wav",
-    "reference_text": "GOLIATH MAKES ANOTHER DISCOVERY",
-    "normalized_text": "GOLIATH MAKES ANOTHER DISCOVERY",
-    "duration": 3.025,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0022.wav",
-    "reference_text": "THEY WERE CERTAINLY NO NEARER THE SOLUTION OF THEIR PROBLEM",
-    "normalized_text": "THEY WERE CERTAINLY NO NEARER THE SOLUTION OF THEIR PROBLEM",
-    "duration": 3.2,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0023.wav",
-    "reference_text": "THE POOR LITTLE THINGS CRIED CYNTHIA THINK OF THEM HAVING BEEN TURNED TO THE WALL ALL THESE YEARS",
-    "normalized_text": "THE POOR LITTLE THINGS CRIED CYNTHIA THINK OF THEM HAVING BEEN TURNED TO THE WALL ALL THESE YEARS",
-    "duration": 5.56,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0024.wav",
-    "reference_text": "NOW WHAT WAS THE SENSE OF IT TWO INNOCENT BABIES LIKE THAT",
-    "normalized_text": "NOW WHAT WAS THE SENSE OF IT TWO INNOCENT BABIES LIKE THAT",
-    "duration": 3.385,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0025.wav",
-    "reference_text": "BUT JOYCE HAD NOT BEEN LISTENING ALL AT ONCE SHE PUT DOWN HER CANDLE ON THE TABLE AND FACED HER COMPANION",
-    "normalized_text": "BUT JOYCE HAD NOT BEEN LISTENING ALL AT ONCE SHE PUT DOWN HER CANDLE ON THE TABLE AND FACED HER COMPANION",
-    "duration": 6.15,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0026.wav",
-    "reference_text": "THE TWIN BROTHER DID SOMETHING SHE DIDN'T LIKE AND SHE TURNED HIS PICTURE TO THE WALL",
-    "normalized_text": "THE TWIN BROTHER DID SOMETHING SHE DIDN'T LIKE AND SHE TURNED HIS PICTURE TO THE WALL",
-    "duration": 5.035,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0027.wav",
-    "reference_text": "HERS HAPPENED TO BE IN THE SAME FRAME TOO BUT SHE EVIDENTLY DIDN'T CARE ABOUT THAT",
-    "normalized_text": "HERS HAPPENED TO BE IN THE SAME FRAME TOO BUT SHE EVIDENTLY DIDN'T CARE ABOUT THAT",
-    "duration": 4.455,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0028.wav",
-    "reference_text": "NOW WHAT HAVE YOU TO SAY CYNTHIA SPRAGUE",
-    "normalized_text": "NOW WHAT HAVE YOU TO SAY CYNTHIA SPRAGUE",
-    "duration": 2.82,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0029.wav",
-    "reference_text": "I THOUGHT WE WERE STUMPED AGAIN WHEN I FIRST SAW THAT PICTURE BUT IT'S BEEN OF SOME USE AFTER ALL",
-    "normalized_text": "I THOUGHT WE WERE STUMPED AGAIN WHEN I FIRST SAW THAT PICTURE BUT IT'S BEEN OF SOME USE AFTER ALL",
-    "duration": 5.185,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0030.wav",
-    "reference_text": "DO YOU SUPPOSE THE MINIATURE WAS A COPY OF THE SAME THING",
-    "normalized_text": "DO YOU SUPPOSE THE MINIATURE WAS A COPY OF THE SAME THING",
-    "duration": 3.405,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0031.wav",
-    "reference_text": "WHAT IN THE WORLD IS THAT QUERIED JOYCE",
-    "normalized_text": "WHAT IN THE WORLD IS THAT QUERIED JOYCE",
-    "duration": 2.69,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0032.wav",
-    "reference_text": "THEY WORRY ME TERRIBLY AND BESIDES I'D LIKE TO SEE WHAT THIS LOVELY FURNITURE LOOKS LIKE WITHOUT SUCH QUANTITIES OF DUST ALL OVER IT GOOD SCHEME CYN",
-    "normalized_text": "THEY WORRY ME TERRIBLY AND BESIDES I'D LIKE TO SEE WHAT THIS LOVELY FURNITURE LOOKS LIKE WITHOUT SUCH QUANTITIES OF DUST ALL OVER IT GOOD SCHEME CYN",
-    "duration": 9.24,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0033.wav",
-    "reference_text": "WE'LL COME IN HERE THIS AFTERNOON WITH OLD CLOTHES ON AND HAVE A REGULAR HOUSE CLEANING",
-    "normalized_text": "WE'LL COME IN HERE THIS AFTERNOON WITH OLD CLOTHES ON AND HAVE A REGULAR HOUSE CLEANING",
-    "duration": 4.655,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0034.wav",
-    "reference_text": "IT CAN'T HURT ANYTHING I'M SURE FOR WE WON'T DISTURB THINGS AT ALL",
-    "normalized_text": "IT CAN'T HURT ANYTHING I'M SURE FOR WE WON'T DISTURB THINGS AT ALL",
-    "duration": 4.305,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0035.wav",
-    "reference_text": "THIS THOUGHT HOWEVER DID NOT ENTER THE HEADS OF THE ENTHUSIASTIC PAIR",
-    "normalized_text": "THIS THOUGHT HOWEVER DID NOT ENTER THE HEADS OF THE ENTHUSIASTIC PAIR",
-    "duration": 4.72,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0036.wav",
-    "reference_text": "SMUGGLING THE HOUSE CLEANING PARAPHERNALIA INTO THE CELLAR WINDOW UNOBSERVED THAT AFTERNOON PROVED NO EASY TASK FOR CYNTHIA HAD ADDED A WHISK BROOM AND DUST PAN TO THE OUTFIT",
-    "normalized_text": "SMUGGLING THE HOUSE CLEANING PARAPHERNALIA INTO THE CELLAR WINDOW UNOBSERVED THAT AFTERNOON PROVED NO EASY TASK FOR CYNTHIA HAD ADDED A WHISK BROOM AND DUST PAN TO THE OUTFIT",
-    "duration": 12.405,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0037.wav",
-    "reference_text": "THE LURE PROVED TOO MUCH FOR HIM AND HE CAME SPORTING AFTER IT AS FRISKILY AS A YOUNG KITTEN MUCH TO CYNTHIA'S DELIGHT WHEN SHE CAUGHT SIGHT OF HIM",
-    "normalized_text": "THE LURE PROVED TOO MUCH FOR HIM AND HE CAME SPORTING AFTER IT AS FRISKILY AS A YOUNG KITTEN MUCH TO CYNTHIA'S DELIGHT WHEN SHE CAUGHT SIGHT OF HIM",
-    "duration": 9.205,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0038.wav",
-    "reference_text": "OH LET HIM COME ALONG SHE URGED I DO LOVE TO SEE HIM ABOUT THAT OLD HOUSE",
-    "normalized_text": "OH LET HIM COME ALONG SHE URGED I DO LOVE TO SEE HIM ABOUT THAT OLD HOUSE",
-    "duration": 5.41,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0039.wav",
     "reference_text": "HE MAKES IT SORT OF COZIER",
     "normalized_text": "HE MAKES IT SORT OF COZIER",
     "duration": 2.14,
@@ -320,7 +64,7 @@
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0040.wav",
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0008.wav",
     "reference_text": "NOW LET'S DUST THE FURNITURE AND PICTURES",
     "normalized_text": "NOW LET'S DUST THE FURNITURE AND PICTURES",
     "duration": 2.575,
@@ -328,15 +72,191 @@
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0041.wav",
-    "reference_text": "YET LITTLE AS IT WAS IT HAD ALREADY MADE A VAST DIFFERENCE IN THE ASPECT OF THE ROOM",
-    "normalized_text": "YET LITTLE AS IT WAS IT HAD ALREADY MADE A VAST DIFFERENCE IN THE ASPECT OF THE ROOM",
-    "duration": 6.315,
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0009.wav",
+    "reference_text": "OH LET HIM COME ALONG SHE URGED I DO LOVE TO SEE HIM ABOUT THAT OLD HOUSE",
+    "normalized_text": "OH LET HIM COME ALONG SHE URGED I DO LOVE TO SEE HIM ABOUT THAT OLD HOUSE",
+    "duration": 5.41,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0042.wav",
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0010.wav",
+    "reference_text": "I DO NOT KNOW I AM DAZED BEWILDERED",
+    "normalized_text": "I DO NOT KNOW I AM DAZED BEWILDERED",
+    "duration": 3.73,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0011.wav",
+    "reference_text": "COME COME RETURNED HAWKEYE UNCASING HIS HONEST COUNTENANCE THE BETTER TO ASSURE THE WAVERING CONFIDENCE OF HIS COMPANION YOU MAY SEE A SKIN WHICH IF IT BE NOT AS WHITE AS ONE OF THE GENTLE ONES HAS NO TINGE OF RED TO IT THAT THE WINDS OF THE HEAVEN AND THE SUN HAVE NOT BESTOWED NOW LET US TO BUSINESS",
+    "normalized_text": "COME COME RETURNED HAWKEYE UNCASING HIS HONEST COUNTENANCE THE BETTER TO ASSURE THE WAVERING CONFIDENCE OF HIS COMPANION YOU MAY SEE A SKIN WHICH IF IT BE NOT AS WHITE AS ONE OF THE GENTLE ONES HAS NO TINGE OF RED TO IT THAT THE WINDS OF THE HEAVEN AND THE SUN HAVE NOT BESTOWED NOW LET US TO BUSINESS",
+    "duration": 18.525,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0012.wav",
+    "reference_text": "CONCORD RETURNED TO ITS PLACE AMIDST THE TENTS",
+    "normalized_text": "CONCORD RETURNED TO ITS PLACE AMIDST THE TENTS",
+    "duration": 3.505,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0013.wav",
+    "reference_text": "THEY DREW THEIR SWORDS HID THEIR FACES IN THE FLAPS OF THEIR CLOAKS TURNED BACK AND SOON CAME IN FRONT OF THE LITTLE PARTY WHO HAD NOT YET DONE GIVING THANKS TO GOD FOR THEIR ESCAPE FROM THOSE AUDACIOUS MEN",
+    "normalized_text": "THEY DREW THEIR SWORDS HID THEIR FACES IN THE FLAPS OF THEIR CLOAKS TURNED BACK AND SOON CAME IN FRONT OF THE LITTLE PARTY WHO HAD NOT YET DONE GIVING THANKS TO GOD FOR THEIR ESCAPE FROM THOSE AUDACIOUS MEN",
+    "duration": 12.475,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0014.wav",
+    "reference_text": "THEN AS IF SATISFIED OF THEIR SAFETY THE SCOUT LEFT HIS POSITION AND SLOWLY ENTERED THE PLACE",
+    "normalized_text": "THEN AS IF SATISFIED OF THEIR SAFETY THE SCOUT LEFT HIS POSITION AND SLOWLY ENTERED THE PLACE",
+    "duration": 5.655,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0015.wav",
+    "reference_text": "THEY WORRY ME TERRIBLY AND BESIDES I'D LIKE TO SEE WHAT THIS LOVELY FURNITURE LOOKS LIKE WITHOUT SUCH QUANTITIES OF DUST ALL OVER IT GOOD SCHEME CYN",
+    "normalized_text": "THEY WORRY ME TERRIBLY AND BESIDES I'D LIKE TO SEE WHAT THIS LOVELY FURNITURE LOOKS LIKE WITHOUT SUCH QUANTITIES OF DUST ALL OVER IT GOOD SCHEME CYN",
+    "duration": 9.24,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0016.wav",
+    "reference_text": "IF A ROCK OR A RIVULET OR A BIT OF EARTH HARDER THAN COMMON SEVERED THE LINKS OF THE CLEW THEY FOLLOWED THE TRUE EYE OF THE SCOUT RECOVERED THEM AT A DISTANCE AND SELDOM RENDERED THE DELAY OF A SINGLE MOMENT NECESSARY",
+    "normalized_text": "IF A ROCK OR A RIVULET OR A BIT OF EARTH HARDER THAN COMMON SEVERED THE LINKS OF THE CLEW THEY FOLLOWED THE TRUE EYE OF THE SCOUT RECOVERED THEM AT A DISTANCE AND SELDOM RENDERED THE DELAY OF A SINGLE MOMENT NECESSARY",
+    "duration": 13.695,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0017.wav",
+    "reference_text": "THE NIGHT WAS CLEAR STARLIT AND SPLENDID THE TEMPEST HAD PASSED AWAY AND THE SWEET INFLUENCES OF THE EVENING HAD RESTORED LIFE PEACE AND SECURITY EVERYWHERE",
+    "normalized_text": "THE NIGHT WAS CLEAR STARLIT AND SPLENDID THE TEMPEST HAD PASSED AWAY AND THE SWEET INFLUENCES OF THE EVENING HAD RESTORED LIFE PEACE AND SECURITY EVERYWHERE",
+    "duration": 10.81,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0018.wav",
+    "reference_text": "THE BEAR SHOOK HIS SHAGGY SIDES AND THEN A WELL KNOWN VOICE REPLIED",
+    "normalized_text": "THE BEAR SHOOK HIS SHAGGY SIDES AND THEN A WELL KNOWN VOICE REPLIED",
+    "duration": 4.4,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0019.wav",
+    "reference_text": "DO YOU SUPPOSE THE MINIATURE WAS A COPY OF THE SAME THING",
+    "normalized_text": "DO YOU SUPPOSE THE MINIATURE WAS A COPY OF THE SAME THING",
+    "duration": 3.405,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0020.wav",
+    "reference_text": "UNCAS CAST HIS SKIN AND STEPPED FORTH IN HIS OWN BEAUTIFUL PROPORTIONS",
+    "normalized_text": "UNCAS CAST HIS SKIN AND STEPPED FORTH IN HIS OWN BEAUTIFUL PROPORTIONS",
+    "duration": 4.15,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0021.wav",
+    "reference_text": "EXTINGUISHED BRANDS WERE LYING AROUND A SPRING THE OFFALS OF A DEER WERE SCATTERED ABOUT THE PLACE AND THE TREES BORE EVIDENT MARKS OF HAVING BEEN BROWSED BY THE HORSES",
+    "normalized_text": "EXTINGUISHED BRANDS WERE LYING AROUND A SPRING THE OFFALS OF A DEER WERE SCATTERED ABOUT THE PLACE AND THE TREES BORE EVIDENT MARKS OF HAVING BEEN BROWSED BY THE HORSES",
+    "duration": 10.49,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0022.wav",
+    "reference_text": "I HAD AGAIN BEEN ACTING UNDER THE INFLUENCE OF THIS MAN'S POWER",
+    "normalized_text": "I HAD AGAIN BEEN ACTING UNDER THE INFLUENCE OF THIS MAN'S POWER",
+    "duration": 4.34,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0023.wav",
+    "reference_text": "HE OFTEN STOPPED TO EXAMINE THE TREES NOR DID HE CROSS A RIVULET WITHOUT ATTENTIVELY CONSIDERING THE QUANTITY THE VELOCITY AND THE COLOR OF ITS WATERS",
+    "normalized_text": "HE OFTEN STOPPED TO EXAMINE THE TREES NOR DID HE CROSS A RIVULET WITHOUT ATTENTIVELY CONSIDERING THE QUANTITY THE VELOCITY AND THE COLOR OF ITS WATERS",
+    "duration": 9.865,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0024.wav",
+    "reference_text": "THE EYES OF THE WHOLE PARTY FOLLOWED THE UNEXPECTED MOVEMENT AND READ THEIR SUCCESS IN THE AIR OF TRIUMPH THAT THE YOUTH ASSUMED",
+    "normalized_text": "THE EYES OF THE WHOLE PARTY FOLLOWED THE UNEXPECTED MOVEMENT AND READ THEIR SUCCESS IN THE AIR OF TRIUMPH THAT THE YOUTH ASSUMED",
+    "duration": 7.875,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0025.wav",
+    "reference_text": "RUN BACK UNCAS AND BRING ME THE SIZE OF THE SINGER'S FOOT",
+    "normalized_text": "RUN BACK UNCAS AND BRING ME THE SIZE OF THE SINGER'S FOOT",
+    "duration": 3.49,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0026.wav",
+    "reference_text": "FROM THE RESPECT PAID HER ON ALL SIDES SHE SEEMED LIKE A QUEEN AND FROM THE ADORATION WITH WHICH SHE WAS TREATED BY TWO OR THREE SHE APPEARED AN OBJECT OF WORSHIP THE QUEEN MOTHER GAVE THE FRENCH THE MOST AFFECTIONATE RECEPTION FRANCE WAS HER NATIVE COUNTRY AND SHE HAD SUFFERED TOO MUCH UNHAPPINESS IN ENGLAND FOR ENGLAND TO HAVE MADE HER FORGET FRANCE",
+    "normalized_text": "FROM THE RESPECT PAID HER ON ALL SIDES SHE SEEMED LIKE A QUEEN AND FROM THE ADORATION WITH WHICH SHE WAS TREATED BY TWO OR THREE SHE APPEARED AN OBJECT OF WORSHIP THE QUEEN MOTHER GAVE THE FRENCH THE MOST AFFECTIONATE RECEPTION FRANCE WAS HER NATIVE COUNTRY AND SHE HAD SUFFERED TOO MUCH UNHAPPINESS IN ENGLAND FOR ENGLAND TO HAVE MADE HER FORGET FRANCE",
+    "duration": 23.315,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0027.wav",
+    "reference_text": "NO SOUND BROKE THE STILLNESS OF THE NIGHT",
+    "normalized_text": "NO SOUND BROKE THE STILLNESS OF THE NIGHT",
+    "duration": 3.295,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0028.wav",
+    "reference_text": "CHINGACHGOOK HAD CAUGHT THE LOOK AND MOTIONING WITH HIS HAND HE BADE HIM SPEAK",
+    "normalized_text": "CHINGACHGOOK HAD CAUGHT THE LOOK AND MOTIONING WITH HIS HAND HE BADE HIM SPEAK",
+    "duration": 5.54,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0029.wav",
+    "reference_text": "THEY DREW BACK A LITTLE FROM THE ENTRANCE AND MOTIONED TO THE SUPPOSED CONJURER TO ENTER",
+    "normalized_text": "THEY DREW BACK A LITTLE FROM THE ENTRANCE AND MOTIONED TO THE SUPPOSED CONJURER TO ENTER",
+    "duration": 4.9,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0030.wav",
+    "reference_text": "A SOUND OF VOICES A FLASH OF LIGHT",
+    "normalized_text": "A SOUND OF VOICES A FLASH OF LIGHT",
+    "duration": 3.835,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0031.wav",
+    "reference_text": "I KNOW HE HAD IT THIS VERY EVENING",
+    "normalized_text": "I KNOW HE HAD IT THIS VERY EVENING",
+    "duration": 2.34,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0032.wav",
     "reference_text": "SURFACE DUST AT LEAST HAD BEEN REMOVED AND THE FINE OLD FURNITURE GAVE A HINT OF ITS REAL ELEGANCE AND POLISH",
     "normalized_text": "SURFACE DUST AT LEAST HAD BEEN REMOVED AND THE FINE OLD FURNITURE GAVE A HINT OF ITS REAL ELEGANCE AND POLISH",
     "duration": 7.355,
@@ -344,55 +264,111 @@
     "split": "test"
   },
   {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0033.wav",
+    "reference_text": "MOTHER DEAR FATHER DO YOU HEAR ME",
+    "normalized_text": "MOTHER DEAR FATHER DO YOU HEAR ME",
+    "duration": 2.375,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0034.wav",
+    "reference_text": "ELEVEN O'CLOCK HAD STRUCK IT WAS A FINE CLEAR NIGHT THEY WERE THE ONLY PERSONS ON THE ROAD AND THEY SAUNTERED LEISURELY ALONG TO AVOID PAYING THE PRICE OF FATIGUE FOR THE RECREATION PROVIDED FOR THE TOLEDANS IN THEIR VALLEY OR ON THE BANKS OF THEIR RIVER",
+    "normalized_text": "ELEVEN O'CLOCK HAD STRUCK IT WAS A FINE CLEAR NIGHT THEY WERE THE ONLY PERSONS ON THE ROAD AND THEY SAUNTERED LEISURELY ALONG TO AVOID PAYING THE PRICE OF FATIGUE FOR THE RECREATION PROVIDED FOR THE TOLEDANS IN THEIR VALLEY OR ON THE BANKS OF THEIR RIVER",
+    "duration": 15.77,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0035.wav",
+    "reference_text": "KEEP SILENT AS LONG AS MAY BE AND IT WOULD BE WISE WHEN YOU DO SPEAK TO BREAK OUT SUDDENLY IN ONE OF YOUR SHOUTINGS WHICH WILL SERVE TO REMIND THE INDIANS THAT YOU ARE NOT ALTOGETHER AS RESPONSIBLE AS MEN SHOULD BE",
+    "normalized_text": "KEEP SILENT AS LONG AS MAY BE AND IT WOULD BE WISE WHEN YOU DO SPEAK TO BREAK OUT SUDDENLY IN ONE OF YOUR SHOUTINGS WHICH WILL SERVE TO REMIND THE INDIANS THAT YOU ARE NOT ALTOGETHER AS RESPONSIBLE AS MEN SHOULD BE",
+    "duration": 11.28,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0036.wav",
+    "reference_text": "HE HAD NO OCCASION TO DELAY FOR AT THE NEXT INSTANT A BURST OF CRIES FILLED THE OUTER AIR AND RAN ALONG THE WHOLE EXTENT OF THE VILLAGE",
+    "normalized_text": "HE HAD NO OCCASION TO DELAY FOR AT THE NEXT INSTANT A BURST OF CRIES FILLED THE OUTER AIR AND RAN ALONG THE WHOLE EXTENT OF THE VILLAGE",
+    "duration": 7.975,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0037.wav",
+    "reference_text": "THE YOUNG MAN IS IN BONDAGE AND MUCH I FEAR HIS DEATH IS DECREED",
+    "normalized_text": "THE YOUNG MAN IS IN BONDAGE AND MUCH I FEAR HIS DEATH IS DECREED",
+    "duration": 4.185,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0038.wav",
+    "reference_text": "WILL THE HURONS HEAR HIS GROANS",
+    "normalized_text": "WILL THE HURONS HEAR HIS GROANS",
+    "duration": 2.24,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0039.wav",
+    "reference_text": "BUT THAT IS KAFFAR'S KNIFE",
+    "normalized_text": "BUT THAT IS KAFFAR'S KNIFE",
+    "duration": 2.16,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0040.wav",
+    "reference_text": "THERE WAS SOMETHING IN HIS AIR AND MANNER THAT BETRAYED TO THE SCOUT THE UTTER CONFUSION OF THE STATE OF HIS MIND",
+    "normalized_text": "THERE WAS SOMETHING IN HIS AIR AND MANNER THAT BETRAYED TO THE SCOUT THE UTTER CONFUSION OF THE STATE OF HIS MIND",
+    "duration": 6.285,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0041.wav",
+    "reference_text": "UNCAS WHO HAD ALREADY APPROACHED THE DOOR IN READINESS TO LEAD THE WAY NOW RECOILED AND PLACED HIMSELF ONCE MORE IN THE BOTTOM OF THE LODGE",
+    "normalized_text": "UNCAS WHO HAD ALREADY APPROACHED THE DOOR IN READINESS TO LEAD THE WAY NOW RECOILED AND PLACED HIMSELF ONCE MORE IN THE BOTTOM OF THE LODGE",
+    "duration": 7.815,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0042.wav",
+    "reference_text": "DELIVERED IN A STRONG TONE OF ASSENT ANNOUNCED THE GRATIFICATION THE SAVAGE WOULD RECEIVE IN WITNESSING SUCH AN EXHIBITION OF WEAKNESS IN AN ENEMY SO LONG HATED AND SO MUCH FEARED",
+    "normalized_text": "DELIVERED IN A STRONG TONE OF ASSENT ANNOUNCED THE GRATIFICATION THE SAVAGE WOULD RECEIVE IN WITNESSING SUCH AN EXHIBITION OF WEAKNESS IN AN ENEMY SO LONG HATED AND SO MUCH FEARED",
+    "duration": 10.755,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0043.wav",
-    "reference_text": "THEN SHE SUDDENLY REMARKED",
-    "normalized_text": "THEN SHE SUDDENLY REMARKED",
-    "duration": 1.895,
+    "reference_text": "YES I NEED REPOSE MANY THINGS HAVE AGITATED ME TO DAY BOTH IN MIND AND BODY WHEN YOU RETURN TO MORROW I SHALL NO LONGER BE THE SAME MAN",
+    "normalized_text": "YES I NEED REPOSE MANY THINGS HAVE AGITATED ME TO DAY BOTH IN MIND AND BODY WHEN YOU RETURN TO MORROW I SHALL NO LONGER BE THE SAME MAN",
+    "duration": 10.015,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0044.wav",
-    "reference_text": "AND MY POCKET MONEY IS GETTING LOW AGAIN AND YOU HAVEN'T ANY LEFT AS USUAL",
-    "normalized_text": "AND MY POCKET MONEY IS GETTING LOW AGAIN AND YOU HAVEN'T ANY LEFT AS USUAL",
-    "duration": 4.85,
+    "reference_text": "WELL WHAT CAN'T BE DONE BY MAIN COURAGE IN WAR MUST BE DONE BY CIRCUMVENTION",
+    "normalized_text": "WELL WHAT CAN'T BE DONE BY MAIN COURAGE IN WAR MUST BE DONE BY CIRCUMVENTION",
+    "duration": 5.225,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0045.wav",
-    "reference_text": "THEY SAY ILLUMINATION BY CANDLE LIGHT IS THE PRETTIEST IN THE WORLD",
-    "normalized_text": "THEY SAY ILLUMINATION BY CANDLE LIGHT IS THE PRETTIEST IN THE WORLD",
-    "duration": 4.05,
+    "reference_text": "THE TASK WILL NOT BE DIFFICULT RETURNED DAVID HESITATING THOUGH I GREATLY FEAR YOUR PRESENCE WOULD RATHER INCREASE THAN MITIGATE HIS UNHAPPY FORTUNES",
+    "normalized_text": "THE TASK WILL NOT BE DIFFICULT RETURNED DAVID HESITATING THOUGH I GREATLY FEAR YOUR PRESENCE WOULD RATHER INCREASE THAN MITIGATE HIS UNHAPPY FORTUNES",
+    "duration": 10.0,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0046.wav",
-    "reference_text": "WHY IT'S GOLIATH AS USUAL THEY BOTH CRIED PEERING IN",
-    "normalized_text": "WHY IT'S GOLIATH AS USUAL THEY BOTH CRIED PEERING IN",
-    "duration": 4.12,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0047.wav",
-    "reference_text": "ISN'T HE THE GREATEST FOR GETTING INTO ODD CORNERS",
-    "normalized_text": "ISN'T HE THE GREATEST FOR GETTING INTO ODD CORNERS",
-    "duration": 3.085,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0048.wav",
-    "reference_text": "FORGETTING ALL THEIR WEARINESS THEY SEIZED THEIR CANDLES AND SCURRIED THROUGH THE HOUSE FINDING AN OCCASIONAL PAPER TUCKED AWAY IN SOME ODD CORNER",
-    "normalized_text": "FORGETTING ALL THEIR WEARINESS THEY SEIZED THEIR CANDLES AND SCURRIED THROUGH THE HOUSE FINDING AN OCCASIONAL PAPER TUCKED AWAY IN SOME ODD CORNER",
-    "duration": 8.27,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0049.wav",
     "reference_text": "WELL I'M CONVINCED THAT THE BOARDED UP HOUSE MYSTERY HAPPENED NOT EARLIER THAN APRIL SIXTEENTH EIGHTEEN SIXTY ONE AND PROBABLY NOT MUCH LATER",
     "normalized_text": "WELL I'M CONVINCED THAT THE BOARDED UP HOUSE MYSTERY HAPPENED NOT EARLIER THAN APRIL SIXTEENTH EIGHTEEN SIXTY ONE AND PROBABLY NOT MUCH LATER",
     "duration": 9.875,
@@ -400,319 +376,87 @@
     "split": "test"
   },
   {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0047.wav",
+    "reference_text": "WHO TOUCHES ME AM I IN BED",
+    "normalized_text": "WHO TOUCHES ME AM I IN BED",
+    "duration": 2.215,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0048.wav",
+    "reference_text": "THE SCOUT WHO HAD LEFT DAVID AT THE DOOR TO ASCERTAIN THEY WERE NOT OBSERVED THOUGHT IT PRUDENT TO PRESERVE HIS DISGUISE UNTIL ASSURED OF THEIR PRIVACY",
+    "normalized_text": "THE SCOUT WHO HAD LEFT DAVID AT THE DOOR TO ASCERTAIN THEY WERE NOT OBSERVED THOUGHT IT PRUDENT TO PRESERVE HIS DISGUISE UNTIL ASSURED OF THEIR PRIVACY",
+    "duration": 8.895,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech/librispeech_asr_clean_0049.wav",
+    "reference_text": "IN THE LIGHT OF THE MOON I SAW A KNIFE RED WITH BLOOD AND MY HAND TOO WAS ALSO DISCOLOURED",
+    "normalized_text": "IN THE LIGHT OF THE MOON I SAW A KNIFE RED WITH BLOOD AND MY HAND TOO WAS ALSO DISCOLOURED",
+    "duration": 7.41,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0000.wav",
-    "reference_text": "I AM FROM THE CUTTER LYING OFF THE COAST",
-    "normalized_text": "I AM FROM THE CUTTER LYING OFF THE COAST",
-    "duration": 2.095,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0001.wav",
-    "reference_text": "DON'T CRY HE SAID I WAS OBLIGED TO COME",
-    "normalized_text": "DON'T CRY HE SAID I WAS OBLIGED TO COME",
-    "duration": 2.51,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0002.wav",
-    "reference_text": "AND AND YOU HAVE NOT FOUND OUT ANYTHING CAME IN QUICK FRIGHTENED TONES",
-    "normalized_text": "AND AND YOU HAVE NOT FOUND OUT ANYTHING CAME IN QUICK FRIGHTENED TONES",
-    "duration": 5.02,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0003.wav",
-    "reference_text": "I WISH YOU WOULD BELIEVE ME THAT I AM IN AS GREAT TROUBLE ABOUT IT AS YOU ARE",
-    "normalized_text": "I WISH YOU WOULD BELIEVE ME THAT I AM IN AS GREAT TROUBLE ABOUT IT AS YOU ARE",
-    "duration": 3.83,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0004.wav",
-    "reference_text": "THAT MY FATHER SIR RISDON GRAEME HAS SMUGGLED GOODS HERE",
-    "normalized_text": "THAT MY FATHER SIR RISDON GRAEME HAS SMUGGLED GOODS HERE",
-    "duration": 3.605,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0005.wav",
-    "reference_text": "HE COULD NOT HELP IT HE HATES THE SMUGGLERS YOU SHALL NOT TELL",
-    "normalized_text": "HE COULD NOT HELP IT HE HATES THE SMUGGLERS YOU SHALL NOT TELL",
-    "duration": 3.425,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0006.wav",
-    "reference_text": "PRAY PRAY SAY YOU WILL NOT ARCHY WAS SILENT",
-    "normalized_text": "PRAY PRAY SAY YOU WILL NOT ARCHY WAS SILENT",
-    "duration": 3.72,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0007.wav",
-    "reference_text": "THEN AS ARCHY STOOD IN THE DARK LITERALLY AGHAST WITH ASTONISHMENT HE HEARD THE FAINT RUSTLING ONCE MORE AND AGAIN ALL WAS SILENT",
-    "normalized_text": "THEN AS ARCHY STOOD IN THE DARK LITERALLY AGHAST WITH ASTONISHMENT HE HEARD THE FAINT RUSTLING ONCE MORE AND AGAIN ALL WAS SILENT",
-    "duration": 7.69,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0008.wav",
-    "reference_text": "HE LAUGHED BUT IT WAS A CURIOUS KIND OF LAUGH FULL OF VEXATION INJURED AMOUR PROPRE AS THE FRENCH CALL OUR LOVE OF OUR OWN DIGNITY OF WHICH ARCHIBALD RAYSTOKE IN THE FULL FLUSH OF HIS YOUNG BELIEF IN HIS IMPORTANCE AS A BRITISH OFFICER HAD A PRETTY GOOD STOCK",
-    "normalized_text": "HE LAUGHED BUT IT WAS A CURIOUS KIND OF LAUGH FULL OF VEXATION INJURED AMOUR PROPRE AS THE FRENCH CALL OUR LOVE OF OUR OWN DIGNITY OF WHICH ARCHIBALD RAYSTOKE IN THE FULL FLUSH OF HIS YOUNG BELIEF IN HIS IMPORTANCE AS A BRITISH OFFICER HAD A PRETTY GOOD STOCK",
-    "duration": 14.73,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0009.wav",
-    "reference_text": "IT ALL COMES OF DRESSING UP IN THIS STUPID WAY LIKE A ROUGH FISHER LAD",
-    "normalized_text": "IT ALL COMES OF DRESSING UP IN THIS STUPID WAY LIKE A ROUGH FISHER LAD",
-    "duration": 3.99,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0010.wav",
-    "reference_text": "COLD WATER CAME ON THIS IDEA DIRECTLY AS HE RECALLED THE FACT THAT THE DARKNESS WAS INTENSE AND CELIA COULD NOT HAVE SEEN HIM",
-    "normalized_text": "COLD WATER CAME ON THIS IDEA DIRECTLY AS HE RECALLED THE FACT THAT THE DARKNESS WAS INTENSE AND CELIA COULD NOT HAVE SEEN HIM",
-    "duration": 6.81,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0011.wav",
-    "reference_text": "I'LL SOON SHOW THEM THAT I AM NOT GOING TO BE PLAYED WITH",
-    "normalized_text": "I'LL SOON SHOW THEM THAT I AM NOT GOING TO BE PLAYED WITH",
-    "duration": 2.93,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0012.wav",
-    "reference_text": "FOR IT SUDDENLY OCCURRED TO HIM THAT HE WAS NOT ONLY A PRISONER BUT A PRISONER IN THE POWER OF A VERY RECKLESS SET OF PEOPLE WHO WOULD STOP AT NOTHING",
-    "normalized_text": "FOR IT SUDDENLY OCCURRED TO HIM THAT HE WAS NOT ONLY A PRISONER BUT A PRISONER IN THE POWER OF A VERY RECKLESS SET OF PEOPLE WHO WOULD STOP AT NOTHING",
-    "duration": 7.145,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0013.wav",
-    "reference_text": "NO HE THOUGHT TO HIMSELF I DON'T BELIEVE THEY WOULD KILL ME BUT THEY WOULD KNOCK ME ABOUT",
-    "normalized_text": "NO HE THOUGHT TO HIMSELF I DON'T BELIEVE THEY WOULD KILL ME BUT THEY WOULD KNOCK ME ABOUT",
-    "duration": 5.38,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0014.wav",
-    "reference_text": "THE KICK HE HAD RECEIVED WAS A FORETASTE OF WHAT HE MIGHT EXPECT AND AFTER A LITTLE CONSIDERATION HE CAME TO THE CONCLUSION THAT HIS DUTY WAS TO ESCAPE AND GET BACK TO THE CUTTER AS QUICKLY AS HE COULD",
-    "normalized_text": "THE KICK HE HAD RECEIVED WAS A FORETASTE OF WHAT HE MIGHT EXPECT AND AFTER A LITTLE CONSIDERATION HE CAME TO THE CONCLUSION THAT HIS DUTY WAS TO ESCAPE AND GET BACK TO THE CUTTER AS QUICKLY AS HE COULD",
-    "duration": 9.71,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0015.wav",
-    "reference_text": "TO DO THIS HE MUST SCHEME LIE HID TILL MORNING THEN MAKE FOR THE NEAREST POINT AND SIGNAL FOR HELP UNLESS A BOAT'S CREW WERE ALREADY SEARCHING FOR HIM HOW TO ESCAPE",
-    "normalized_text": "TO DO THIS HE MUST SCHEME LIE HID TILL MORNING THEN MAKE FOR THE NEAREST POINT AND SIGNAL FOR HELP UNLESS A BOAT'S CREW WERE ALREADY SEARCHING FOR HIM HOW TO ESCAPE",
-    "duration": 9.61,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0016.wav",
-    "reference_text": "THE WINDOW WAS BARRED BUT HE WENT TO IT AND TRIED THE BARS ONE BY ONE TO FIND THEM ALL SOLIDLY FITTED INTO THE STONE SILL",
-    "normalized_text": "THE WINDOW WAS BARRED BUT HE WENT TO IT AND TRIED THE BARS ONE BY ONE TO FIND THEM ALL SOLIDLY FITTED INTO THE STONE SILL",
-    "duration": 6.045,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0017.wav",
-    "reference_text": "NEXT MOMENT AS HE FELT HIS WAY ABOUT HIS HAND TOUCHED AN OLD FASHIONED MARBLE MANTELPIECE FIREPLACE CHIMNEY",
-    "normalized_text": "NEXT MOMENT AS HE FELT HIS WAY ABOUT HIS HAND TOUCHED AN OLD FASHIONED MARBLE MANTELPIECE FIREPLACE CHIMNEY",
-    "duration": 6.675,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0018.wav",
-    "reference_text": "YES IF OTHER WAYS FAILED HE COULD ESCAPE UP THE CHIMNEY",
-    "normalized_text": "YES IF OTHER WAYS FAILED HE COULD ESCAPE UP THE CHIMNEY",
-    "duration": 3.11,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0019.wav",
-    "reference_text": "NO THAT WAS TOO BAD HE COULD NOT DO THAT",
-    "normalized_text": "NO THAT WAS TOO BAD HE COULD NOT DO THAT",
-    "duration": 2.365,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0020.wav",
-    "reference_text": "SYMPATHY AND PITY FOR THE DWELLERS IN THE HOZE WERE COMPLETELY GONE NOW AND HE SET HIS TEETH FAST AND MENTALLY CALLED HIMSELF A WEAK IDIOT FOR EVER THINKING ABOUT SUCH PEOPLE",
-    "normalized_text": "SYMPATHY AND PITY FOR THE DWELLERS IN THE HOZE WERE COMPLETELY GONE NOW AND HE SET HIS TEETH FAST AND MENTALLY CALLED HIMSELF A WEAK IDIOT FOR EVER THINKING ABOUT SUCH PEOPLE",
-    "duration": 8.78,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0021.wav",
-    "reference_text": "A NARROW TABLE AGAINST THE WALL IN TWO PLACES",
-    "normalized_text": "A NARROW TABLE AGAINST THE WALL IN TWO PLACES",
-    "duration": 2.96,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0022.wav",
-    "reference_text": "HE WENT AND TRIED TO FORCE HIS HEAD THROUGH RECALLING AS HE DID THAT WHERE A PERSON'S HEAD WOULD GO THE REST OF THE BODY WOULD PASS",
-    "normalized_text": "HE WENT AND TRIED TO FORCE HIS HEAD THROUGH RECALLING AS HE DID THAT WHERE A PERSON'S HEAD WOULD GO THE REST OF THE BODY WOULD PASS",
-    "duration": 5.87,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0023.wav",
-    "reference_text": "BUT THERE WAS NO CHANCE FOR HIS BODY THERE THE HEAD WOULD NOT GO FIRST",
-    "normalized_text": "BUT THERE WAS NO CHANCE FOR HIS BODY THERE THE HEAD WOULD NOT GO FIRST",
-    "duration": 3.365,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0024.wav",
-    "reference_text": "A FELLOW WHO WAS SHUT UP IN PRISON FOR LIFE MIGHT DO IT HE SAID BUT NOT IN A CASE LIKE THIS",
-    "normalized_text": "A FELLOW WHO WAS SHUT UP IN PRISON FOR LIFE MIGHT DO IT HE SAID BUT NOT IN A CASE LIKE THIS",
-    "duration": 5.145,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0025.wav",
-    "reference_text": "SURE YOU'VE LOOKED ROUND EVERYWHERE BOY YES FATHER QUITE",
-    "normalized_text": "SURE YOU'VE LOOKED ROUND EVERYWHERE BOY YES FATHER QUITE",
-    "duration": 4.21,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0026.wav",
-    "reference_text": "I'M GOING HOME TO BREAKFAST",
-    "normalized_text": "I'M GOING HOME TO BREAKFAST",
-    "duration": 1.83,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0027.wav",
-    "reference_text": "SHALL I COME TOO FATHER NO",
-    "normalized_text": "SHALL I COME TOO FATHER NO",
+    "reference_text": "NEVER MIND ABOUT THAT LET ME OUT OF THIS PLACE",
+    "normalized_text": "NEVER MIND ABOUT THAT LET ME OUT OF THIS PLACE",
     "duration": 2.74,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0028.wav",
-    "reference_text": "STOP HERE TILL SIR RISDON COMES DOWN AND TELL HIM I'M VERY SORRY THAT WE SHOULD HAVE CLEARED OUT LAST NIGHT ONLY A BORN FOOL SAW JERRY NANDY'S LOBSTER BOAT COMING INTO THE COVE AND CAME RUNNING TO SAY IT WAS A PARTY FROM THE CUTTER YES FATHER",
-    "normalized_text": "STOP HERE TILL SIR RISDON COMES DOWN AND TELL HIM I'M VERY SORRY THAT WE SHOULD HAVE CLEARED OUT LAST NIGHT ONLY A BORN FOOL SAW JERRY NANDY'S LOBSTER BOAT COMING INTO THE COVE AND CAME RUNNING TO SAY IT WAS A PARTY FROM THE CUTTER YES FATHER",
-    "duration": 12.17,
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0001.wav",
+    "reference_text": "LADY GRAEME LOOKED GHASTLY",
+    "normalized_text": "LADY GRAEME LOOKED GHASTLY",
+    "duration": 2.2,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0029.wav",
-    "reference_text": "TELL HIM NOT TO BE UNEASY TIS ALL RIGHT AND I'LL HAVE EVERYTHING CLEAR AWAY TO NIGHT",
-    "normalized_text": "TELL HIM NOT TO BE UNEASY TIS ALL RIGHT AND I'LL HAVE EVERYTHING CLEAR AWAY TO NIGHT",
-    "duration": 4.325,
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0002.wav",
+    "reference_text": "SAY MESTER GURR SAID DICK AFTER ONE OF THESE SEARCHES HE WOULDN'T RUN AWAY WHAT",
+    "normalized_text": "SAY MESTER GURR SAID DICK AFTER ONE OF THESE SEARCHES HE WOULDN'T RUN AWAY WHAT",
+    "duration": 5.09,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0030.wav",
-    "reference_text": "THE DULL SOUND OF DEPARTING STEPS AND A LOW WHISTLING SOUND COMING DOWN THROUGH THE SKYLIGHT WINDOW INTO THE CABIN WHERE ARCHY RAYSTOKE LAY WITH HIS HEAVY EYELIDS PRESSED DOWN BY SLEEP",
-    "normalized_text": "THE DULL SOUND OF DEPARTING STEPS AND A LOW WHISTLING SOUND COMING DOWN THROUGH THE SKYLIGHT WINDOW INTO THE CABIN WHERE ARCHY RAYSTOKE LAY WITH HIS HEAVY EYELIDS PRESSED DOWN BY SLEEP",
-    "duration": 8.605,
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0003.wav",
+    "reference_text": "YOU DO NOT KNOW NO",
+    "normalized_text": "YOU DO NOT KNOW NO",
+    "duration": 2.8,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0031.wav",
-    "reference_text": "WHAT A QUEER DREAM HE THOUGHT TO HIMSELF",
-    "normalized_text": "WHAT A QUEER DREAM HE THOUGHT TO HIMSELF",
-    "duration": 2.415,
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0004.wav",
+    "reference_text": "TO HIS ASTONISHMENT THE BOY DID NOT FLINCH BUT THRUST HIS OWN ARMS THROUGH PLACING THEM ABOUT THE MIDDY'S WAIST CLENCHING HIS HANDS BEHIND AND UTTERING A SHARP WHISTLE",
+    "normalized_text": "TO HIS ASTONISHMENT THE BOY DID NOT FLINCH BUT THRUST HIS OWN ARMS THROUGH PLACING THEM ABOUT THE MIDDY'S WAIST CLENCHING HIS HANDS BEHIND AND UTTERING A SHARP WHISTLE",
+    "duration": 7.665,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0032.wav",
-    "reference_text": "BUT HOW QUEER FOR MISTER GURR TO BE TALKING LIKE THAT TO ANDREW TEAL THE BOY WHO HELPED THE COOK",
-    "normalized_text": "BUT HOW QUEER FOR MISTER GURR TO BE TALKING LIKE THAT TO ANDREW TEAL THE BOY WHO HELPED THE COOK",
-    "duration": 5.14,
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0005.wav",
+    "reference_text": "NOT YOU ONLY A SHAM",
+    "normalized_text": "NOT YOU ONLY A SHAM",
+    "duration": 2.2,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0033.wav",
-    "reference_text": "AND WHY DID ANDY CALL MISTER GURR FATHER",
-    "normalized_text": "AND WHY DID ANDY CALL MISTER GURR FATHER",
-    "duration": 2.7,
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0006.wav",
+    "reference_text": "BEG PARDON SIR BUT CAN YOU AS A GENTLEMAN ASSURE ME THAT HE IS NOT HERE CERTAINLY SAID SIR RISDON",
+    "normalized_text": "BEG PARDON SIR BUT CAN YOU AS A GENTLEMAN ASSURE ME THAT HE IS NOT HERE CERTAINLY SAID SIR RISDON",
+    "duration": 5.385,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0034.wav",
-    "reference_text": "THERE WAS AN INTERVAL OF THINKING OVER THIS KNOTTY QUESTION DURING WHICH THE LOW WHISTLING WENT ON",
-    "normalized_text": "THERE WAS AN INTERVAL OF THINKING OVER THIS KNOTTY QUESTION DURING WHICH THE LOW WHISTLING WENT ON",
-    "duration": 4.91,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0035.wav",
-    "reference_text": "AND I'M HUNGRY TOO TIME I WAS UP I SUPPOSE",
-    "normalized_text": "AND I'M HUNGRY TOO TIME I WAS UP I SUPPOSE",
-    "duration": 3.165,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0036.wav",
-    "reference_text": "NO HE WAS NOT DREAMING FOR HE WAS LOOKING OUT ON THE SEA OVER WHICH A FAINT MIST HUNG LIKE WREATHS OF SMOKE",
-    "normalized_text": "NO HE WAS NOT DREAMING FOR HE WAS LOOKING OUT ON THE SEA OVER WHICH A FAINT MIST HUNG LIKE WREATHS OF SMOKE",
-    "duration": 6.795,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0037.wav",
-    "reference_text": "WHAT DID THEY SAY FALSE ALARM TELL SIR RISDON THEY WOULD CLEAR ALL AWAY TO NIGHT SEE IF ANYTHING HAD BEEN LEFT ABOUT LOBSTER BOAT",
-    "normalized_text": "WHAT DID THEY SAY FALSE ALARM TELL SIR RISDON THEY WOULD CLEAR ALL AWAY TO NIGHT SEE IF ANYTHING HAD BEEN LEFT ABOUT LOBSTER BOAT",
-    "duration": 9.975,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0038.wav",
-    "reference_text": "ONCE OUT OF THAT ROOM HE COULD RAN AND BY DAYLIGHT THE SMUGGLERS DARE NOT HUNT HIM DOWN",
-    "normalized_text": "ONCE OUT OF THAT ROOM HE COULD RAN AND BY DAYLIGHT THE SMUGGLERS DARE NOT HUNT HIM DOWN",
-    "duration": 4.85,
-    "dataset": "librispeech_asr",
-    "split": "test"
-  },
-  {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0039.wav",
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0007.wav",
     "reference_text": "OH THOSE BARS HE MENTALLY EXCLAIMED AND HE WAS ADVANCING TOWARD THEM WHEN JUST AS HE DREW NEAR THERE WAS A RUSTLING NOISE UNDER THE WINDOW A COUPLE OF HANDS SEIZED THE BARS THERE WAS A SCRATCHING OF BOOT TOES AGAINST STONE WORK AND RAM'S FACE APPEARED TO GAZE INTO THE ROOM BY INTENTION BUT INTO THE ASTONISHED COUNTENANCE OF THE YOUNG MIDSHIPMAN INSTEAD",
     "normalized_text": "OH THOSE BARS HE MENTALLY EXCLAIMED AND HE WAS ADVANCING TOWARD THEM WHEN JUST AS HE DREW NEAR THERE WAS A RUSTLING NOISE UNDER THE WINDOW A COUPLE OF HANDS SEIZED THE BARS THERE WAS A SCRATCHING OF BOOT TOES AGAINST STONE WORK AND RAM'S FACE APPEARED TO GAZE INTO THE ROOM BY INTENTION BUT INTO THE ASTONISHED COUNTENANCE OF THE YOUNG MIDSHIPMAN INSTEAD",
     "duration": 18.91,
@@ -720,7 +464,7 @@
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0040.wav",
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0008.wav",
     "reference_text": "RAM WAS THE FIRST TO RECOVER FROM HIS SURPRISE",
     "normalized_text": "RAM WAS THE FIRST TO RECOVER FROM HIS SURPRISE",
     "duration": 2.66,
@@ -728,15 +472,191 @@
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0041.wav",
-    "reference_text": "HULLO HE SAID WHO ARE YOU",
-    "normalized_text": "HULLO HE SAID WHO ARE YOU",
-    "duration": 2.075,
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0009.wav",
+    "reference_text": "ONCE OUT OF THAT ROOM HE COULD RAN AND BY DAYLIGHT THE SMUGGLERS DARE NOT HUNT HIM DOWN",
+    "normalized_text": "ONCE OUT OF THAT ROOM HE COULD RAN AND BY DAYLIGHT THE SMUGGLERS DARE NOT HUNT HIM DOWN",
+    "duration": 4.85,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
-    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0042.wav",
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0010.wav",
+    "reference_text": "NOT YOU LOOK LIKE A WILD BEAST IN A CAGE LIKE A MONKEY YOU INSOLENT",
+    "normalized_text": "NOT YOU LOOK LIKE A WILD BEAST IN A CAGE LIKE A MONKEY YOU INSOLENT",
+    "duration": 4.805,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0011.wav",
+    "reference_text": "CERTAINLY SIR SMUGGLERS ARE SMUGGLERS INDEED",
+    "normalized_text": "CERTAINLY SIR SMUGGLERS ARE SMUGGLERS INDEED",
+    "duration": 3.3,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0012.wav",
+    "reference_text": "I AM FROM THE CUTTER LYING OFF THE COAST",
+    "normalized_text": "I AM FROM THE CUTTER LYING OFF THE COAST",
+    "duration": 2.095,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0013.wav",
+    "reference_text": "TO THESE HE COMMITTED ME COMMENDING ME TO THEIR CARE AND SAYING THIS MAN IS A STRANGER SO TAKE HIM WITH YOU AND TEACH HIM HOW TO GATHER THAT HE MAY GET HIS DAILY BREAD AND YOU WILL EARN YOUR REWARD AND RECOMPENSE IN HEAVEN",
+    "normalized_text": "TO THESE HE COMMITTED ME COMMENDING ME TO THEIR CARE AND SAYING THIS MAN IS A STRANGER SO TAKE HIM WITH YOU AND TEACH HIM HOW TO GATHER THAT HE MAY GET HIS DAILY BREAD AND YOU WILL EARN YOUR REWARD AND RECOMPENSE IN HEAVEN",
+    "duration": 15.77,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0014.wav",
+    "reference_text": "WHAT FOR THERE AREN'T A PUBLIC HOUSE FOR TEN MILES DIDN'T MEAN THAT",
+    "normalized_text": "WHAT FOR THERE AREN'T A PUBLIC HOUSE FOR TEN MILES DIDN'T MEAN THAT",
+    "duration": 4.205,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0015.wav",
+    "reference_text": "BUT HOW QUEER FOR MISTER GURR TO BE TALKING LIKE THAT TO ANDREW TEAL THE BOY WHO HELPED THE COOK",
+    "normalized_text": "BUT HOW QUEER FOR MISTER GURR TO BE TALKING LIKE THAT TO ANDREW TEAL THE BOY WHO HELPED THE COOK",
+    "duration": 5.14,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0016.wav",
+    "reference_text": "SURELY CRIED SIR RISDON EXCITEDLY",
+    "normalized_text": "SURELY CRIED SIR RISDON EXCITEDLY",
+    "duration": 2.595,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0017.wav",
+    "reference_text": "YES IF OTHER WAYS FAILED HE COULD ESCAPE UP THE CHIMNEY",
+    "normalized_text": "YES IF OTHER WAYS FAILED HE COULD ESCAPE UP THE CHIMNEY",
+    "duration": 3.11,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0018.wav",
+    "reference_text": "YOU DON'T THINK MISTER GURR THAT THEY WOULD DARE TO INJURE HIM IF HE WAS SO UNLUCKY AS TO BE CAUGHT",
+    "normalized_text": "YOU DON'T THINK MISTER GURR THAT THEY WOULD DARE TO INJURE HIM IF HE WAS SO UNLUCKY AS TO BE CAUGHT",
+    "duration": 4.23,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0019.wav",
+    "reference_text": "THE DULL SOUND OF DEPARTING STEPS AND A LOW WHISTLING SOUND COMING DOWN THROUGH THE SKYLIGHT WINDOW INTO THE CABIN WHERE ARCHY RAYSTOKE LAY WITH HIS HEAVY EYELIDS PRESSED DOWN BY SLEEP",
+    "normalized_text": "THE DULL SOUND OF DEPARTING STEPS AND A LOW WHISTLING SOUND COMING DOWN THROUGH THE SKYLIGHT WINDOW INTO THE CABIN WHERE ARCHY RAYSTOKE LAY WITH HIS HEAVY EYELIDS PRESSED DOWN BY SLEEP",
+    "duration": 8.605,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0020.wav",
+    "reference_text": "DON'T KNOW AS HE HAS BEEN SEEN ABOUT HERE DO YOU SAID GURR LOOKING AT HER SEARCHINGLY NO SIR",
+    "normalized_text": "DON'T KNOW AS HE HAS BEEN SEEN ABOUT HERE DO YOU SAID GURR LOOKING AT HER SEARCHINGLY NO SIR",
+    "duration": 4.95,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0021.wav",
+    "reference_text": "SIR RISDON WAS SILENT",
+    "normalized_text": "SIR RISDON WAS SILENT",
+    "duration": 2.025,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0022.wav",
+    "reference_text": "WHY I COULD TIE YOU UP IN A KNOT AND HEAVE YOU OFF THE CLIFF ANY DAY WHAT A GAME",
+    "normalized_text": "WHY I COULD TIE YOU UP IN A KNOT AND HEAVE YOU OFF THE CLIFF ANY DAY WHAT A GAME",
+    "duration": 4.635,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0023.wav",
+    "reference_text": "HERE MY LAD WHERE'S YOUR MASTER",
+    "normalized_text": "HERE MY LAD WHERE'S YOUR MASTER",
+    "duration": 2.31,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0024.wav",
+    "reference_text": "A LAD LOOKING LIKE A COMMON SAILOR AND WEARING A RED CAP NO SAID SIR RISDON",
+    "normalized_text": "A LAD LOOKING LIKE A COMMON SAILOR AND WEARING A RED CAP NO SAID SIR RISDON",
+    "duration": 4.515,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0025.wav",
+    "reference_text": "BEHOLD A SHIP WAS MAKING FOR THE ISLAND THROUGH THE DASHING SEA AND CLASHING WAVES",
+    "normalized_text": "BEHOLD A SHIP WAS MAKING FOR THE ISLAND THROUGH THE DASHING SEA AND CLASHING WAVES",
+    "duration": 5.91,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0026.wav",
+    "reference_text": "I WISH YOU WOULD BELIEVE ME THAT I AM IN AS GREAT TROUBLE ABOUT IT AS YOU ARE",
+    "normalized_text": "I WISH YOU WOULD BELIEVE ME THAT I AM IN AS GREAT TROUBLE ABOUT IT AS YOU ARE",
+    "duration": 3.83,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0027.wav",
+    "reference_text": "A HAPPY INSPIRATION HAD COME AND PLACING ONE HAND UPON HIS BREAST HE THRUST IN THE OTHER GAVE A TUG AND DREW OUT HIS LITTLE CURVED DIRK GLANCED AT THE EDGE RAN TO THE WINDOW AND BEGAN TO CUT AT ONE OF THE BARS LABOUR IN VAIN",
+    "normalized_text": "A HAPPY INSPIRATION HAD COME AND PLACING ONE HAND UPON HIS BREAST HE THRUST IN THE OTHER GAVE A TUG AND DREW OUT HIS LITTLE CURVED DIRK GLANCED AT THE EDGE RAN TO THE WINDOW AND BEGAN TO CUT AT ONE OF THE BARS LABOUR IN VAIN",
+    "duration": 12.41,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0028.wav",
+    "reference_text": "GURR SALUTED AND STATED HIS BUSINESS WHILE THE BARONET WHO HAD TURNED SALLOWER AND MORE CAREWORN THAN HIS LOT DREW A BREATH FULL OF RELIEF ONE OF YOUR SHIP BOYS HE SAID",
+    "normalized_text": "GURR SALUTED AND STATED HIS BUSINESS WHILE THE BARONET WHO HAD TURNED SALLOWER AND MORE CAREWORN THAN HIS LOT DREW A BREATH FULL OF RELIEF ONE OF YOUR SHIP BOYS HE SAID",
+    "duration": 8.345,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0029.wav",
+    "reference_text": "YES SIR OF COURSE",
+    "normalized_text": "YES SIR OF COURSE",
+    "duration": 1.885,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0030.wav",
+    "reference_text": "BE QUICK THERE'S A GOOD FELLOW I WANT TO GET AWAY AT ONCE",
+    "normalized_text": "BE QUICK THERE'S A GOOD FELLOW I WANT TO GET AWAY AT ONCE",
+    "duration": 3.2,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0031.wav",
+    "reference_text": "IT WAS YOUR TURN YESTERDAY IT'S MINE TO DAY WHAT A GAME",
+    "normalized_text": "IT WAS YOUR TURN YESTERDAY IT'S MINE TO DAY WHAT A GAME",
+    "duration": 3.415,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0032.wav",
     "reference_text": "GO ROUND AND OPEN THE DOOR I WAS SHUT IN LAST NIGHT BY MISTAKE",
     "normalized_text": "GO ROUND AND OPEN THE DOOR I WAS SHUT IN LAST NIGHT BY MISTAKE",
     "duration": 3.245,
@@ -744,59 +664,299 @@
     "split": "test"
   },
   {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0033.wav",
+    "reference_text": "THERE I ABODE A LITTLE AND THEN WENT ON TO BAGHDAD WHERE I ENTERED MY QUARTER AND FOUND MY HOUSE AND FOREGATHERED WITH MY FAMILY AND SALUTED MY FRIENDS WHO GAVE ME JOY OF MY SAFE RETURN AND I LAID UP ALL MY GOODS AND VALUABLES IN MY STOREHOUSES",
+    "normalized_text": "THERE I ABODE A LITTLE AND THEN WENT ON TO BAGHDAD WHERE I ENTERED MY QUARTER AND FOUND MY HOUSE AND FOREGATHERED WITH MY FAMILY AND SALUTED MY FRIENDS WHO GAVE ME JOY OF MY SAFE RETURN AND I LAID UP ALL MY GOODS AND VALUABLES IN MY STOREHOUSES",
+    "duration": 16.845,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0034.wav",
+    "reference_text": "HEARING THIS I WAS SORE TROUBLED REMEMBERING WHAT I HAD BEFORE SUFFERED FROM THE APE KIND",
+    "normalized_text": "HEARING THIS I WAS SORE TROUBLED REMEMBERING WHAT I HAD BEFORE SUFFERED FROM THE APE KIND",
+    "duration": 6.1,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0035.wav",
+    "reference_text": "MISTER RAYSTOKE SIR DON'T BE A FOOL",
+    "normalized_text": "MISTER RAYSTOKE SIR DON'T BE A FOOL",
+    "duration": 2.74,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0036.wav",
+    "reference_text": "BOY BOUT SEVENTEEN WITH A RED CAP NO SIR INDEED I'VE NOT",
+    "normalized_text": "BOY BOUT SEVENTEEN WITH A RED CAP NO SIR INDEED I'VE NOT",
+    "duration": 4.02,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0037.wav",
+    "reference_text": "BEG PARDON SIR DIDN'T MEAN ANY HARM",
+    "normalized_text": "BEG PARDON SIR DIDN'T MEAN ANY HARM",
+    "duration": 2.8,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0038.wav",
+    "reference_text": "I DO ASSURE YOU THERE'S NOTHING HERE BUT WHAT YOU MAY SEE",
+    "normalized_text": "I DO ASSURE YOU THERE'S NOTHING HERE BUT WHAT YOU MAY SEE",
+    "duration": 2.64,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0039.wav",
+    "reference_text": "ARCHY CHECKED HIMSELF AND THE BOY LAUGHED",
+    "normalized_text": "ARCHY CHECKED HIMSELF AND THE BOY LAUGHED",
+    "duration": 2.535,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0040.wav",
+    "reference_text": "AWKWARD BIT O COUNTRY SIR SIX MILES ROW BEFORE YOU CAN FIND A PLACE TO LAND",
+    "normalized_text": "AWKWARD BIT O COUNTRY SIR SIX MILES ROW BEFORE YOU CAN FIND A PLACE TO LAND",
+    "duration": 4.39,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0041.wav",
+    "reference_text": "NO WAIT",
+    "normalized_text": "NO WAIT",
+    "duration": 1.82,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0042.wav",
+    "reference_text": "AWK WARD MISTER GURR AWKWARD",
+    "normalized_text": "AWK WARD MISTER GURR AWKWARD",
+    "duration": 2.57,
+    "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0043.wav",
-    "reference_text": "I SAW YOU LAST NIGHT AND WONDERED WHOSE BOY YOU WAS",
-    "normalized_text": "I SAW YOU LAST NIGHT AND WONDERED WHOSE BOY YOU WAS",
-    "duration": 2.78,
+    "reference_text": "THE WINDOW WAS BARRED BUT HE WENT TO IT AND TRIED THE BARS ONE BY ONE TO FIND THEM ALL SOLIDLY FITTED INTO THE STONE SILL",
+    "normalized_text": "THE WINDOW WAS BARRED BUT HE WENT TO IT AND TRIED THE BARS ONE BY ONE TO FIND THEM ALL SOLIDLY FITTED INTO THE STONE SILL",
+    "duration": 6.045,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0044.wav",
-    "reference_text": "IT WAS YOU FATHER KICKED FOR SHIRKING AND MY WELL I HARDLY KNOWED YOU",
-    "normalized_text": "IT WAS YOU FATHER KICKED FOR SHIRKING AND MY WELL I HARDLY KNOWED YOU",
-    "duration": 5.035,
+    "reference_text": "AT LAST THE LITTLE LIEUTENANT COULD BEAR THE ANXIETY NO LONGER",
+    "normalized_text": "AT LAST THE LITTLE LIEUTENANT COULD BEAR THE ANXIETY NO LONGER",
+    "duration": 3.355,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0045.wav",
-    "reference_text": "NONSENSE",
-    "normalized_text": "NONSENSE",
-    "duration": 1.315,
+    "reference_text": "NO WAIT ANOTHER HALF HOUR",
+    "normalized_text": "NO WAIT ANOTHER HALF HOUR",
+    "duration": 2.07,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0046.wav",
-    "reference_text": "WON'T DO SAID RAM GRINNING",
-    "normalized_text": "WON'T DO SAID RAM GRINNING",
-    "duration": 2.005,
+    "reference_text": "BEEN PLAYING THE SPY THAT'S WHAT YOU'VE BEEN DOING WHO LOCKED YOU IN",
+    "normalized_text": "BEEN PLAYING THE SPY THAT'S WHAT YOU'VE BEEN DOING WHO LOCKED YOU IN",
+    "duration": 3.8,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0047.wav",
-    "reference_text": "THINK I DON'T KNOW YOU MISTER ORFICER",
-    "normalized_text": "THINK I DON'T KNOW YOU MISTER ORFICER",
-    "duration": 2.215,
+    "reference_text": "AND CEASED NOT SAILING TILL WE ARRIVED SAFELY AT BASSORAH",
+    "normalized_text": "AND CEASED NOT SAILING TILL WE ARRIVED SAFELY AT BASSORAH",
+    "duration": 4.105,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0048.wav",
-    "reference_text": "WON'T DO SAID RAM QUICKLY I KNOW YOU",
-    "normalized_text": "WON'T DO SAID RAM QUICKLY I KNOW YOU",
-    "duration": 2.7,
+    "reference_text": "NOW THEN WHY DO YOU WANT TO GO ASHORE",
+    "normalized_text": "NOW THEN WHY DO YOU WANT TO GO ASHORE",
+    "duration": 2.695,
     "dataset": "librispeech_asr",
     "split": "test"
   },
   {
     "audio_filepath": "samples/benchmark/autoresearch/librispeech_other/librispeech_asr_other_0049.wav",
-    "reference_text": "BEEN PLAYING THE SPY THAT'S WHAT YOU'VE BEEN DOING WHO LOCKED YOU IN",
-    "normalized_text": "BEEN PLAYING THE SPY THAT'S WHAT YOU'VE BEEN DOING WHO LOCKED YOU IN",
-    "duration": 3.8,
+    "reference_text": "I TOLD YOU A FISHER BOY CRIED ARCHY IMPATIENTLY BUT TRYING NOT TO OFFEND HIS VISITOR WHO POSSESSED THE POWER OF CONFERRING FREEDOM BY SPEAKING SHARPLY",
+    "normalized_text": "I TOLD YOU A FISHER BOY CRIED ARCHY IMPATIENTLY BUT TRYING NOT TO OFFEND HIS VISITOR WHO POSSESSED THE POWER OF CONFERRING FREEDOM BY SPEAKING SHARPLY",
+    "duration": 7.87,
     "dataset": "librispeech_asr",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0000.wav",
+    "reference_text": "Dear John, I hope this email finds you well.",
+    "normalized_text": "Dear John, I hope this email finds you well.",
+    "duration": 2.5136875,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0001.wav",
+    "reference_text": "Please schedule a meeting for Thursday at 3 PM.",
+    "normalized_text": "Please schedule a meeting for Thursday at 3 PM.",
+    "duration": 2.65875,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0002.wav",
+    "reference_text": "The quarterly revenue was up 12% compared to last year.",
+    "normalized_text": "The quarterly revenue was up 12% compared to last year.",
+    "duration": 3.030625,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0003.wav",
+    "reference_text": "Could you send me the report by end of day?",
+    "normalized_text": "Could you send me the report by end of day?",
+    "duration": 1.93625,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0004.wav",
+    "reference_text": "I'll be working from home on Friday.",
+    "normalized_text": "I'll be working from home on Friday.",
+    "duration": 1.60025,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0005.wav",
+    "reference_text": "The new iPhone comes out in September.",
+    "normalized_text": "The new iPhone comes out in September.",
+    "duration": 1.97775,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0006.wav",
+    "reference_text": "Let's grab coffee at Blue Bottle on Market Street.",
+    "normalized_text": "Let's grab coffee at Blue Bottle on Market Street.",
+    "duration": 2.8579375,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0007.wav",
+    "reference_text": "My flight lands at SFO at 6:45 AM.",
+    "normalized_text": "My flight lands at SFO at 6:45 AM.",
+    "duration": 3.01825,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0008.wav",
+    "reference_text": "The temperature outside is around 68 degrees Fahrenheit.",
+    "normalized_text": "The temperature outside is around 68 degrees Fahrenheit.",
+    "duration": 2.997625,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0009.wav",
+    "reference_text": "She asked, \"Are you coming to the party tonight?\"",
+    "normalized_text": "She asked, \"Are you coming to the party tonight?\"",
+    "duration": 2.0684375,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0010.wav",
+    "reference_text": "The project deadline has been moved to April 15th.",
+    "normalized_text": "The project deadline has been moved to April 15th.",
+    "duration": 2.8540625,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0011.wav",
+    "reference_text": "Please add milk, eggs, and bread to the shopping list.",
+    "normalized_text": "Please add milk, eggs, and bread to the shopping list.",
+    "duration": 2.7865625,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0012.wav",
+    "reference_text": "I need to call Dr. Smith's office before noon.",
+    "normalized_text": "I need to call Dr. Smith's office before noon.",
+    "duration": 2.533625,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0013.wav",
+    "reference_text": "The API rate limit is 1,000 requests per minute.",
+    "normalized_text": "The API rate limit is 1,000 requests per minute.",
+    "duration": 2.9379375,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0014.wav",
+    "reference_text": "Set a reminder for 9 AM tomorrow morning.",
+    "normalized_text": "Set a reminder for 9 AM tomorrow morning.",
+    "duration": 2.3705625,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0015.wav",
+    "reference_text": "The package should arrive within 3-5 business days.",
+    "normalized_text": "The package should arrive within 3-5 business days.",
+    "duration": 2.9774375,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0016.wav",
+    "reference_text": "Open a new tab and search for the best Italian restaurants nearby.",
+    "normalized_text": "Open a new tab and search for the best Italian restaurants nearby.",
+    "duration": 3.427875,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0017.wav",
+    "reference_text": "Turn off the lights in the living room.",
+    "normalized_text": "Turn off the lights in the living room.",
+    "duration": 1.44025,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0018.wav",
+    "reference_text": "Reply to Sarah's message and say I'll be 10 minutes late.",
+    "normalized_text": "Reply to Sarah's message and say I'll be 10 minutes late.",
+    "duration": 2.967,
+    "dataset": "dictation_micro",
+    "split": "test"
+  },
+  {
+    "audio_filepath": "samples/benchmark/autoresearch/dictation_micro/dictation_0019.wav",
+    "reference_text": "Create a new document called Q1 Sales Review.",
+    "normalized_text": "Create a new document called Q1 Sales Review.",
+    "duration": 2.677625,
+    "dataset": "dictation_micro",
     "split": "test"
   }
 ]

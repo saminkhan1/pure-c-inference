@@ -61,6 +61,32 @@ This requires just PyTorch and a few standard libraries.
 - **Rolling KV cache**: Decoder KV cache is automatically compacted when it exceeds the sliding window (8192 positions), capping memory usage and allowing unlimited-length audio.
 - **App bundle**: Creates a standalone `.app` for macOS distribution without a paid Apple Developer account.
 
+## Benchmarking & Testing
+
+Run the regression test suite (slow, ~2 min on fast GPU):
+```bash
+make test
+```
+
+Benchmark with the built-in audio samples:
+```bash
+python benchmark.py                    # small/medium/long suite
+python benchmark.py --repeats 3         # 3 repeats for variance
+python benchmark.py --suite night1968   # alternative sample set
+```
+
+Output includes encoder ms, decoder ms/step, wall time, and JSON metrics via `--json-metrics`.
+
+For autoresearch evaluation:
+```bash
+python prepare_datasets.py              # prepare eval datasets (one-time)
+python eval_harness.py                  # run full eval suite (WER + latency)
+./autoresearch.sh                       # build → smoke → full eval, outputs METRIC composite_score=X
+./autoresearch.sh --set-baseline        # run and save score as promotion baseline
+```
+
+See `LOOP.md` for the autoresearch loop protocol, file scope, and experiment history.
+
 ## Usage
 
 ### Basic Transcription
