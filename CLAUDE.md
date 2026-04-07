@@ -9,8 +9,9 @@ HuggingFace: `mistralai/Voxtral-Mini-4B-Realtime-2602`
 
 ```bash
 # Build
-make mps       # Apple Silicon (fastest)
-make blas      # CPU with BLAS (Accelerate on macOS, OpenBLAS on Linux)
+make mps           # Apple Silicon (fastest)
+make wexproflow    # Apple Silicon + Option+Space dictation mode
+make blas          # CPU with BLAS (Accelerate on macOS, OpenBLAS on Linux)
 make clean
 
 # Test (slow — needs fast Apple Silicon GPU, ~2 min on M3/M4 Max)
@@ -18,44 +19,31 @@ make test
 
 # Run (tokens stream to stdout as generated)
 ./voxtral -d voxtral-model -i audio.wav            # default: timing info on stderr
-./voxtral -d voxtral-model -i audio.wav --silent    # no stderr output
+./voxtral -d voxtral-model -i audio.wav --silent  # no stderr output
 ./voxtral -d voxtral-model -i audio.wav --debug     # per-layer/per-chunk details
-./voxtral -d voxtral-model -i audio.wav --alt 0.5   # show alternative tokens inline
+./voxtral -d voxtral-model -i audio.wav --alt 0.5  # show alternative tokens inline
 
 # Microphone input (macOS only, Ctrl+C to stop)
 ./voxtral -d voxtral-model --from-mic               # default: 2s processing interval
-./voxtral -d voxtral-model --from-mic -I 1.0         # 1s interval for lower latency
+./voxtral -d voxtral-model --from-mic -I 1.0        # 1s interval for lower latency
 
 # Stdin input (auto-detects WAV vs raw s16le 16kHz mono)
 cat audio.wav | ./voxtral -d voxtral-model --stdin
 ffmpeg -i samples/I_have_a_dream.ogg -f s16le -ar 16000 -ac 1 - | ./voxtral -d voxtral-model --stdin
+
+# Dictation mode (Option+Space to record, auto-paste on silence)
+./voxtral -d voxtral-model --dictate                # requires make wexproflow
 
 # Download model (~8.9GB)
 ./download_model.sh
 
 # Python reference implementation (self-contained, no mistral_common needed)
 ./pyenv312/bin/python python_simple_implementation.py voxtral-model test_speech.wav
-```
 
-## Key Files
-
-```
-main.c                      - CLI entry point
-voxtral.h                   - Main API header
-voxtral.c                   - Pipeline, streaming API, context management
-voxtral_encoder.c           - Audio encoder (32 layers)
-voxtral_decoder.c           - LLM decoder (26 layers, GQA)
-voxtral_audio.c/.h          - WAV loading, mel spectrogram, incremental mel
-voxtral_tokenizer.c/.h      - Tekken tokenizer
-voxtral_kernels.c/.h        - Math kernels (matmul, attention, norms)
-voxtral_safetensors.c/.h    - Safetensors reader (mmap)
-voxtral_mic.h               - Microphone capture API
-voxtral_mic_macos.c         - macOS mic capture (AudioQueue)
-voxtral_metal.m/.h          - Metal GPU backend
-voxtral_shaders.metal       - Metal compute shaders
-python_simple_implementation.py - Self-contained Python reference
-MODEL.md                    - Architecture & weight format reference
-vllm/                       - Upstream vLLM clone (official reference)
+# Create .app bundle for macOS distribution
+make wexproflow && make app
+make install-beta MODEL_DIR=/path/to/voxtral-model
+make dmg   # Create distributable .dmg
 ```
 
 ## Streaming Architecture
@@ -70,6 +58,9 @@ Default: 2.0s. Lower = more responsive (higher GPU overhead), higher = more effi
 batching (higher latency). For offline file transcription the interval is irrelevant
 since all audio is available at once.
 
+`vox_stream_set_continuous(s, 1)` enables automatic decoder restart for live
+audio sources (microphone, stdin). Essential for `--from-mic` and `--stdin` modes.
+
 ## Alternative Tokens API
 
 `vox_stream_set_alt(s, n_alt, cutoff)` enables tracking up to `n_alt` alternatives
@@ -82,9 +73,45 @@ per token position (max `VOX_MAX_ALT`=4). After softmax, a candidate qualifies i
 
 CLI: `--alt <cutoff>` formats output as `[best|alt1|alt2]` when alternatives exist.
 
+## Monitor Mode
+
+`--monitor` flag prints inline status symbols to stderr showing pipeline activity:
+
+| Symbol | Meaning |
+|--------|---------|
+| `▶` | Encoder processed a chunk |
+| `·` | Decoder prefill |
+| `▪` | Decoder generated tokens (normal speed) |
+| `▸` | Decoder slow (>40ms/step) |
+| `↺`/`⟳`/`↯`/`⌚` | Decoder restart (various causes) |
+
+## Dictation Mode (wexproflow)
+
+Built with `make wexproflow`, provides system-wide voice input:
+
+- **Option+Space** to start/stop recording
+- **Escape** to cancel mid-recording
+- Auto-pastes transcribed text into focused app
+- Menu bar icon shows recording state
+- Single-instance via `flock`
+- History logged to `~/.config/voxtral/history.log`
+
+Requires macOS permissions:
+- **Accessibility** (System Settings → Privacy & Security → Accessibility)
+- **Input Monitoring** (System Settings → Privacy & Security → Input Monitoring)
+
+## JSON Metrics
+
+`--json-metrics` outputs timing data for programmatic use:
+```
+JSON_METRICS: {"time_to_first_token_ms": 123.45, "time_to_final_ms": 678.90}
+```
+
 ## Architecture
 
 See MODEL.md for full architecture details, weight tensor names, tokenizer layout, and decode schedule.
+
+See SPEED.md for performance benchmarks and optimization history.
 
 ## Development Rules
 
@@ -109,4 +136,3 @@ See MODEL.md for full architecture details, weight tensor names, tokenizer layou
 
 - Upstream vLLM clone: `vllm/` (authoritative for official behavior)
 - `vendor_reference/` is a snapshot for local comparison (not authoritative)
-

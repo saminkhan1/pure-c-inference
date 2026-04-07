@@ -1,16 +1,12 @@
 # Voxtral Realtime 4B Pure C Implementation
 
-This is a C implementation of the inference pipeline for the [Mistral AI's Voxtral Realtime 4B model](https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602). It has zero external dependencies beyond the C standard library. The MPS inference is decently fast, while the BLAS acceleration is usable but slow (it continuously convert the bf16 weights to fp32).
+This is a C implementation of the inference pipeline for the [Mistral AI's Voxtral Realtime 4B model](https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602). It has zero external dependencies beyond the C standard library. The MPS inference is fast on Apple Silicon, while the BLAS acceleration is usable but slower.
 
-Audio processing uses a chunked encoder with overlapping windows, bounding memory usage regardless of input length. Audio can also be piped from stdin (`--stdin`), or captured live from the microphone (`--from-mic`, macOS), making it easy to transcode and transcribe any format via ffmpeg. A streaming C API (`vox_stream_t`) lets you feed audio incrementally and receive token strings as they become available.
+Audio processing uses a chunked encoder with overlapping windows, bounding memory usage regardless of input length. Audio can be piped from stdin (`--stdin`), captured live from the microphone (`--from-mic`, macOS), or used in dictation mode (`--dictate`) for system-wide voice input with auto-paste. A streaming C API (`vox_stream_t`) lets you feed audio incrementally and receive token strings as they become available.
 
-**More testing needed:** please note that this project was mostly tested against few samples, and likely requires some more work to be production quality. However the hard part, to understand the model inference and reproduce the inference pipeline, is here, so the rest likely can be done easily. Testing it against very long transcriptions, able to stress the KV cache circular buffer, will be a useful task.
+**Note:** This project was tested against a variety of samples. The KV cache circular buffer handles long audio.
 
 ![demo](samples/demo.gif)
-
-## Motivations (and some rant)
-
-**Thank you to Mistral** for releasing such a great model in an Open Weights fashion. However, the author of this project believes that limiting the inference to a partnership with vLLM, without providing a self-contained reference implementation in Python, limits the model's actual reach and the potential good effects it could have. For this reason, this project was created: it provides both a pure C inference engine and a simple, self-contained Python reference implementation (`python_simple_implementation.py`) that anyone can read and understand without digging through the vLLM codebase.
 
 ## Quick Start
 
@@ -63,6 +59,7 @@ This requires just PyTorch and a few standard libraries.
 - **WAV input**: Supports 16-bit PCM WAV files at any sample rate (auto-resampled to 16kHz).
 - **Chunked encoder**: Processes audio in overlapping chunks, bounding memory regardless of length.
 - **Rolling KV cache**: Decoder KV cache is automatically compacted when it exceeds the sliding window (8192 positions), capping memory usage and allowing unlimited-length audio.
+- **App bundle**: Creates a standalone `.app` for macOS distribution without a paid Apple Developer account.
 
 ## Usage
 
@@ -77,7 +74,7 @@ Tokens stream to stdout as they are generated. By default, timing info is printe
 ```bash
 ./voxtral -d voxtral-model -i samples/test_speech.wav --silent    # no stderr output
 ./voxtral -d voxtral-model -i samples/test_speech.wav --debug     # per-layer/per-chunk details
-./voxtral -d voxtral-model -i samples/test_speech.wav --alt 0.5   # show alternative tokens
+./voxtral -d voxtral-model -i samples/test_speech.wav --alt 0.5     # show alternative tokens
 ```
 
 ### Alternative Tokens
@@ -130,6 +127,15 @@ The `--monitor` flag prints non-intrusive unicode symbols to stderr, inline with
 | `♻` | Full stream reset (mel + encoder + decoder state) |
 
 A healthy stream looks like `▶·▪▪▶▪▪▶▪▪` — encoder chunks interleaved with fast decode batches. If `▸`, `▹`, `⚠`, or `☠` appear frequently, decode is under stress. Restart symbols are normal in long continuous streams; you will typically see pairs like `↺✂`, `⟳♻`, `↯♻`, or `⌚♻`.
+
+### JSON Metrics (`--json-metrics`)
+
+For programmatic use, `--json-metrics` outputs timing data as JSON to stderr:
+
+```bash
+./voxtral -d voxtral-model -i audio.wav --json-metrics
+# Output: JSON_METRICS: {"time_to_first_token_ms": 123.45, "time_to_final_ms": 678.90}
+```
 
 ### Reading Audio from Stdin
 
@@ -337,6 +343,8 @@ vox_stream_free(s);
 
 Use `vox_set_processing_interval(s, seconds)` to control the latency/efficiency tradeoff (equivalent to `-I` on the CLI). When set, `feed()` accumulates audio but only runs the encoder/decoder after at least the specified duration of new audio has been fed. Lower values give more responsive streaming (text appears sooner), higher values batch more audio per encoder call for better GPU utilization. Default is 2.0 seconds. See the `-I` flag documentation above for guidance on choosing values.
 
+Use `vox_stream_set_continuous(s, 1)` for live audio sources (microphone, stdin) — this enables automatic decoder restart when EOS is reached.
+
 **Alternative tokens** — when the model is uncertain, retrieve competing candidates:
 
 ```c
@@ -396,6 +404,10 @@ make uninstall                         # Remove launchd agent + binary
 make clean                             # Clean build artifacts
 make info                              # Show available backends for this platform
 make inspect                           # Build safetensors weight inspector
+make app                               # Create Voxtral.app bundle (requires wexproflow)
+make install-beta MODEL_DIR=/path      # Install app + launchd (no Apple ID needed)
+make dmg                               # Create .dmg for distribution
+make test                              # Run regression tests (slow, needs fast GPU)
 ```
 
 ## Model Download
@@ -427,6 +439,8 @@ The MPS backend runs the entire decoder in a single Metal command buffer per tok
 Decoder speed depends on sequence length: attention scans the full KV cache each step, so longer transcriptions are slower per token. For a 60-second clip (~760 steps), the average is ~31.6 ms/step. For short clips (~15 steps) it's ~23.5 ms/step. Either way, the decoder generates one token per ~80ms of audio, so even at 31.6 ms/step transcription runs ~2.5x faster than real-time.
 
 Longer audio scales linearly with the encoder (O(n) with sliding window attention) and the decoder (one token per 80ms of audio).
+
+See `SPEED.md` for detailed performance benchmarks and optimization history.
 
 ## Model Architecture
 
