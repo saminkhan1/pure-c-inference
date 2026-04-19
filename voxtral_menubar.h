@@ -13,6 +13,8 @@ typedef void *(*vox_worker_fn)(void *user_data);
 int  vox_menubar_run(vox_worker_fn worker_fn, void *user_data);
 
 void vox_menubar_set_recording(int active);
+void vox_menubar_set_processing(void);
+void vox_menubar_set_status(const char *msg);
 void vox_menubar_quit(void);
 int  vox_menubar_wait_for_quit(void);
 

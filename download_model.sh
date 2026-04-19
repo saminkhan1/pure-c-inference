@@ -8,6 +8,7 @@ set -e
 
 MODEL_ID="mistralai/Voxtral-Mini-4B-Realtime-2602"
 MODEL_DIR="voxtral-model"
+TOTAL_SIZE_GB=8.9
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -18,6 +19,7 @@ done
 
 echo "Downloading Voxtral Realtime 4B to ${MODEL_DIR}/"
 echo "Model: ${MODEL_ID}"
+echo "Size: ~${TOTAL_SIZE_GB}GB (may take 5-15 minutes depending on connection)"
 echo ""
 
 mkdir -p "${MODEL_DIR}"
@@ -37,7 +39,12 @@ for file in "${FILES[@]}"; do
         echo "  [skip] ${file} (already exists)"
     else
         echo "  [download] ${file}..."
-        curl -L -o "${dest}" "${BASE_URL}/${file}" --progress-bar
+        # -L follows redirects, --progress-bar shows progress, -C - resumes partial downloads
+        curl -L -o "${dest}" "${BASE_URL}/${file}" --progress-bar -C - || {
+            echo "  [error] Failed to download ${file}. Check your connection and try again."
+            rm -f "${dest}"
+            exit 1
+        }
         echo "  [done] ${file}"
     fi
 done

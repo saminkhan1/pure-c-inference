@@ -32,8 +32,9 @@ static CGEventRef tap_callback(CGEventTapProxy proxy, CGEventType type,
                                CGEventRef event, void *userdata) {
     (void)proxy; (void)userdata;
 
-    /* Re-enable if macOS disabled the tap due to timeout */
-    if (type == kCGEventTapDisabledByTimeout) {
+    /* Re-enable if macOS disabled the tap. */
+    if (type == kCGEventTapDisabledByTimeout ||
+        type == kCGEventTapDisabledByUserInput) {
         CGEventTapEnable(event_tap, true);
         return event;
     }
@@ -49,7 +50,9 @@ static CGEventRef tap_callback(CGEventTapProxy proxy, CGEventType type,
     if (keycode == KEYCODE_R &&
         (flags & kCGEventFlagMaskCommand)) {
         if (user_cb) user_cb(VOX_HOTKEY_TOGGLE);
-        return NULL; /* swallow the event */
+        /* Dictation owns the start/stop hotkey; always swallow it so the
+         * foreground app does not refresh or trigger its own shortcut. */
+        return NULL;
     }
 
     /* Escape → cancel (only swallow when recording is active) */

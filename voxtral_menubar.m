@@ -51,7 +51,7 @@ static int  g_has_last_text = 0;
     [menu addItem:[NSMenuItem separatorItem]];
 
     /* Status row */
-    self.statusLineItem = [[NSMenuItem alloc] initWithTitle:@"Idle — press ⌥Space to dictate"
+    self.statusLineItem = [[NSMenuItem alloc] initWithTitle:@"Idle — press Command+R to dictate"
                                                      action:nil
                                               keyEquivalent:@""];
     self.statusLineItem.enabled = NO;
@@ -196,11 +196,28 @@ void vox_menubar_set_recording(int active) {
         VoxtralDelegate *d = (VoxtralDelegate *)NSApp.delegate;
         if (active) {
             [d setIcon:@"mic.fill" tooltip:@"Recording…"];
-            d.statusLineItem.title = @"Recording… (⌥Space or silence to finish)";
+            d.statusLineItem.title = @"Recording… (Command+R or silence to finish)";
         } else {
             [d setIcon:@"mic" tooltip:@"Idle"];
-            d.statusLineItem.title = @"Idle — press ⌥Space to dictate";
+            d.statusLineItem.title = @"Idle — press Command+R to dictate";
         }
+    });
+}
+
+void vox_menubar_set_processing(void) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VoxtralDelegate *d = (VoxtralDelegate *)NSApp.delegate;
+        [d setIcon:@"waveform" tooltip:@"Transcribing…"];
+        d.statusLineItem.title = @"Transcribing…";
+    });
+}
+
+void vox_menubar_set_status(const char *msg) {
+    NSString *nsMsg = (msg && msg[0]) ? @(msg) : @"Idle — press Command+R to dictate";
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VoxtralDelegate *d = (VoxtralDelegate *)NSApp.delegate;
+        d.statusLineItem.title = nsMsg;
+        d.statusItem.button.toolTip = [NSString stringWithFormat:@"Voxtral — %@", nsMsg];
     });
 }
 
@@ -224,16 +241,23 @@ void vox_menubar_set_error(const char *msg) {
 }
 
 void vox_menubar_set_last_text(const char *text) {
-    if (!text || !text[0]) return;
+    int enable;
+
     pthread_mutex_lock(&g_text_mutex);
-    strncpy(g_last_text_buf, text, sizeof(g_last_text_buf) - 1);
-    g_last_text_buf[sizeof(g_last_text_buf) - 1] = '\0';
-    g_has_last_text = 1;
+    if (text && text[0]) {
+        strncpy(g_last_text_buf, text, sizeof(g_last_text_buf) - 1);
+        g_last_text_buf[sizeof(g_last_text_buf) - 1] = '\0';
+        g_has_last_text = 1;
+    } else {
+        g_last_text_buf[0] = '\0';
+        g_has_last_text = 0;
+    }
+    enable = g_has_last_text ? YES : NO;
     pthread_mutex_unlock(&g_text_mutex);
 
     dispatch_async(dispatch_get_main_queue(), ^{
         VoxtralDelegate *d = (VoxtralDelegate *)NSApp.delegate;
-        d.lastTextItem.enabled = YES;
+        d.lastTextItem.enabled = enable;
     });
 }
 

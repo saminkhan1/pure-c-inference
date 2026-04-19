@@ -31,6 +31,10 @@
 #include <errno.h>
 #include <time.h>
 #include <sys/stat.h>
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#include <limits.h>
+#endif
 
 #define DEFAULT_FEED_CHUNK 16000 /* 1 second at 16kHz */
 
@@ -60,6 +64,78 @@ static void sigint_handler(int sig) { (void)sig; mic_interrupted = 1; }
 #ifdef WEXPROFLOW
 static int pid_fd = -1;
 static char pid_path[512];
+
+#ifdef __APPLE__
+static int is_app_bundle_exec(const char *path) {
+    return path && strstr(path, ".app/Contents/MacOS/") != NULL;
+}
+
+static int resolve_exec_path(char *out, size_t out_sz) {
+    uint32_t size = (uint32_t)out_sz;
+    if (_NSGetExecutablePath(out, &size) != 0) return -1;
+
+    char resolved[PATH_MAX];
+    if (!realpath(out, resolved)) return -1;
+
+    strncpy(out, resolved, out_sz - 1);
+    out[out_sz - 1] = '\0';
+    return 0;
+}
+
+static int try_exec_candidate(const char *path, char **argv) {
+    if (!path || access(path, X_OK) != 0) return 0;
+    fprintf(stderr, "Launching bundled dictation app: %s\n", path);
+    execv(path, argv);
+    fprintf(stderr, "Error: failed to launch bundled dictation app '%s': %s\n",
+            path, strerror(errno));
+    return -1;
+}
+
+static int reexec_dictation_via_app_bundle(char **argv, const char *model_dir) {
+    char exec_path[PATH_MAX];
+    if (resolve_exec_path(exec_path, sizeof(exec_path)) != 0) {
+        fprintf(stderr, "Error: failed to resolve executable path for --dictate\n");
+        return -1;
+    }
+    if (is_app_bundle_exec(exec_path))
+        return 0;
+
+    char candidate[PATH_MAX];
+    const char *slash = strrchr(exec_path, '/');
+    if (slash) {
+        int n = snprintf(candidate, sizeof(candidate), "%.*s/Voxtral.app/Contents/MacOS/voxtral",
+                         (int)(slash - exec_path), exec_path);
+        if (n > 0 && (size_t)n < sizeof(candidate)) {
+            int rc = try_exec_candidate(candidate, argv);
+            if (rc != 0) return rc;
+        }
+    }
+
+    if (try_exec_candidate("/Applications/Voxtral.app/Contents/MacOS/voxtral", argv) != 0)
+        return -1;
+
+    {
+        const char *home = getenv("HOME");
+        if (home) {
+            int n = snprintf(candidate, sizeof(candidate),
+                             "%s/Applications/Voxtral.app/Contents/MacOS/voxtral", home);
+            if (n > 0 && (size_t)n < sizeof(candidate)) {
+                int rc = try_exec_candidate(candidate, argv);
+                if (rc != 0) return rc;
+            }
+        }
+    }
+
+    fprintf(stderr,
+        "Error: --dictate must run from Voxtral.app on macOS.\n"
+        "Build the app bundle first with:\n"
+        "  make wexproflow\n"
+        "Then run:\n"
+        "  open -n Voxtral.app --args -d %s --dictate\n",
+        model_dir ? model_dir : "voxtral-model");
+    return -1;
+}
+#endif
 
 static int pid_lock_acquire(void) {
     const char *home = getenv("HOME");
@@ -144,6 +220,86 @@ struct wf_args {
     int        sound_enabled;     /* play system sounds on start/stop */
 };
 
+#define WF_TEXT_BUF_CAP 8192
+
+static void wf_stop_mic_and_drain(vox_stream_t *stream) {
+    float mic_buf[4800];
+    int n;
+
+    vox_mic_stop();
+    while ((n = vox_mic_read(mic_buf, 4800)) > 0)
+        vox_stream_feed(stream, mic_buf, n);
+}
+
+static int wf_drain_tokens(vox_stream_t *stream, int *first_token,
+                           char *text_buf, int *text_len, int text_cap) {
+    const char *toks[64];
+    int paste_failed = 0;
+    int n;
+
+    while ((n = vox_stream_get(stream, toks, 64)) > 0) {
+        for (int i = 0; i < n; i++) {
+            const char *t = toks[i];
+            int tlen;
+            if (!t) continue;
+
+            if (*first_token) {
+                while (*t == ' ') t++;
+                if (*t) *first_token = 0;
+            }
+            if (!*t) continue;
+
+            if (vox_type_text(t) != 0)
+                paste_failed = 1;
+
+            tlen = (int)strlen(t);
+            if (*text_len + tlen < text_cap - 1) {
+                memcpy(text_buf + *text_len, t, (size_t)tlen);
+                *text_len += tlen;
+                text_buf[*text_len] = '\0';
+            }
+        }
+    }
+
+    return paste_failed;
+}
+
+static void wf_finish_recording(vox_stream_t **stream_ptr, int *first_token,
+                                char *text_buf, int *text_len,
+                                int *paste_failed, int sound_enabled) {
+    vox_stream_t *stream = *stream_ptr;
+    int drain_paste_failed;
+
+    if (!stream) return;
+
+    vox_hotkey_set_recording(0);
+    vox_menubar_set_processing();
+    wf_stop_mic_and_drain(stream);
+    if (sound_enabled) vox_sound_stop();
+
+    vox_stream_finish(stream);
+    drain_paste_failed = wf_drain_tokens(stream, first_token, text_buf, text_len,
+                                         WF_TEXT_BUF_CAP);
+    if (drain_paste_failed)
+        *paste_failed = 1;
+
+    vox_menubar_set_recording(0);
+    if (text_buf[0]) {
+        history_append(text_buf);
+        vox_menubar_set_last_text(text_buf);
+        if (*paste_failed)
+            vox_menubar_set_status("Paste failed - use Copy Last Transcription");
+        else
+            vox_menubar_set_status("Transcribed and pasted");
+    } else {
+        vox_menubar_set_last_text(NULL);
+        vox_menubar_set_status("No speech detected");
+    }
+
+    vox_stream_free(stream);
+    *stream_ptr = NULL;
+}
+
 static void *wexproflow_main(void *arg) {
     struct wf_args *a = (struct wf_args *)arg;
 
@@ -175,36 +331,13 @@ static void *wexproflow_main(void *arg) {
     int wf_silence_count = 0;
     int wf_was_skipping = 0;
     int wf_heard_speech = 0;
+    int wf_overbuf_warned = 0;
+    int wf_paste_failed = 0;
     struct timeval wf_last_speech_tv;
 
     /* Buffer to accumulate typed text for history log */
-    char wf_text_buf[8192];
+    char wf_text_buf[WF_TEXT_BUF_CAP];
     int  wf_text_len = 0;
-
-    /* Drain tokens from stream, type them, and accumulate for history */
-    #define wf_drain_tokens() do { \
-        const char *_toks[64]; \
-        int _n; \
-        while ((_n = vox_stream_get(wf_stream, _toks, 64)) > 0) { \
-            for (int _i = 0; _i < _n; _i++) { \
-                const char *_t = _toks[_i]; \
-                if (wf_first_token) { \
-                    while (*_t == ' ') _t++; \
-                    if (*_t) wf_first_token = 0; \
-                } \
-                if (*_t) { \
-                    if (vox_type_text(_t) != 0) \
-                        fprintf(stderr, "Warning: text injection failed\n"); \
-                    int _tlen = (int)strlen(_t); \
-                    if (wf_text_len + _tlen < (int)sizeof(wf_text_buf) - 1) { \
-                        memcpy(wf_text_buf + wf_text_len, _t, (size_t)_tlen); \
-                        wf_text_len += _tlen; \
-                        wf_text_buf[wf_text_len] = '\0'; \
-                    } \
-                } \
-            } \
-        } \
-    } while (0)
 
     while (!mic_interrupted) {
         if (wf_state == WF_IDLE) {
@@ -243,8 +376,6 @@ static void *wexproflow_main(void *arg) {
                 if (silence) {
                     vox_stream_feed(wf_stream, silence, prewarm_samples);
                     free(silence);
-                    /* Drain any tokens generated from silence */
-                    wf_drain_tokens();
                 }
             }
 
@@ -252,6 +383,8 @@ static void *wexproflow_main(void *arg) {
             wf_silence_count = 0;
             wf_was_skipping = 0;
             wf_heard_speech = 0;
+            wf_overbuf_warned = 0;
+            wf_paste_failed = 0;
             wf_text_len = 0;
             wf_text_buf[0] = '\0';
             gettimeofday(&wf_last_speech_tv, NULL);
@@ -277,24 +410,38 @@ static void *wexproflow_main(void *arg) {
             wf_state = WF_IDLE;
             vox_hotkey_set_recording(0);
             vox_menubar_set_recording(0);
+            vox_menubar_set_status("Dictation cancelled");
             if (a->sound_enabled) vox_sound_stop();
             continue;
         }
 
         if (ev == 1) {
             /* Command+R again: stop, flush, paste, log */
-            vox_mic_stop();
-            vox_stream_finish(wf_stream);
-            wf_drain_tokens();
-            history_append(wf_text_buf);
-            vox_menubar_set_last_text(wf_text_buf);
-            vox_stream_free(wf_stream);
-            wf_stream = NULL;
+            wf_finish_recording(&wf_stream, &wf_first_token, wf_text_buf,
+                                &wf_text_len, &wf_paste_failed,
+                                a->sound_enabled);
             wf_state = WF_IDLE;
-            vox_hotkey_set_recording(0);
-            vox_menubar_set_recording(0);
-            if (a->sound_enabled) vox_sound_stop();
+            wf_heard_speech = 0;
+            wf_overbuf_warned = 0;
             continue;
+        }
+
+        /* Over-buffer: encoder falling behind — skip stale audio */
+        int avail = vox_mic_read_available();
+        if (avail > 80000) {
+            if (!wf_overbuf_warned) {
+                fprintf(stderr, "Warning: dictation can't keep up, skipping audio\n");
+                vox_menubar_set_status("Recording... (catching up; skipped stale audio)");
+                wf_overbuf_warned = 1;
+            }
+            float discard[4800];
+            while (vox_mic_read_available() > 16000)
+                vox_mic_read(discard, 4800);
+            wf_silence_count = 0;
+            wf_was_skipping = 0;
+        } else if (avail < 32000 && wf_overbuf_warned) {
+            wf_overbuf_warned = 0;
+            vox_menubar_set_recording(1);
         }
 
         /* Read mic samples */
@@ -303,15 +450,6 @@ static void *wexproflow_main(void *arg) {
         if (n == 0) {
             usleep(10000); /* 10ms idle */
             continue;
-        }
-
-        /* Over-buffer: encoder falling behind — skip stale audio */
-        if (vox_mic_read_available() > 80000) {
-            float discard[4800];
-            while (vox_mic_read_available() > 16000)
-                vox_mic_read(discard, 4800);
-            wf_silence_count = 0;
-            wf_was_skipping = 0;
         }
 
         /* Silence detection in 10ms windows */
@@ -351,22 +489,22 @@ static void *wexproflow_main(void *arg) {
         double wf_silent_ms = (wf_now.tv_sec  - wf_last_speech_tv.tv_sec)  * 1000.0 +
                               (wf_now.tv_usec - wf_last_speech_tv.tv_usec) / 1000.0;
         if (wf_heard_speech && wf_silent_ms > DICTATE_AUTO_STOP_MS) {
-            vox_mic_stop();
-            vox_stream_finish(wf_stream);
-            wf_drain_tokens();
-            history_append(wf_text_buf);
-            vox_menubar_set_last_text(wf_text_buf);
-            vox_stream_free(wf_stream);
-            wf_stream = NULL;
+            wf_finish_recording(&wf_stream, &wf_first_token, wf_text_buf,
+                                &wf_text_len, &wf_paste_failed,
+                                a->sound_enabled);
             wf_state = WF_IDLE;
-            vox_hotkey_set_recording(0);
-            vox_menubar_set_recording(0);
-            if (a->sound_enabled) vox_sound_stop();
             wf_heard_speech = 0;
+            wf_overbuf_warned = 0;
             continue;
         }
 
-        wf_drain_tokens();
+        if (wf_drain_tokens(wf_stream, &wf_first_token, wf_text_buf,
+                            &wf_text_len, WF_TEXT_BUF_CAP) != 0) {
+            wf_paste_failed = 1;
+            fprintf(stderr, "Warning: text injection failed\n");
+            vox_menubar_set_status("Paste failed - use Copy Last Transcription");
+            vox_menubar_set_last_text(wf_text_buf);
+        }
     }
 
     /* Cleanup on exit */
@@ -397,6 +535,7 @@ static void usage(const char *prog) {
     fprintf(stderr, "  --monitor     Show non-intrusive symbols inline with output (stderr)\n");
     fprintf(stderr, "  --debug       Debug output (per-layer, per-chunk details)\n");
     fprintf(stderr, "  --silent      No status output (only transcription on stdout)\n");
+    fprintf(stderr, "  --json-metrics Output timing data as JSON line on stderr\n");
     fprintf(stderr, "  --version     Show version and exit\n");
     fprintf(stderr, "  -h            Show this help\n");
 }
@@ -523,6 +662,9 @@ int main(int argc, char **argv) {
             verbosity = 0;
         } else if (strcmp(argv[i], "--json-metrics") == 0) {
             json_metrics = 1;
+        } else if (strcmp(argv[i], "--version") == 0) {
+            fprintf(stdout, "voxtral v" VOXTRAL_VERSION "\n");
+            return 0;
         } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
             usage(argv[0]);
             return 0;
@@ -542,6 +684,13 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+#if defined(WEXPROFLOW) && defined(__APPLE__)
+    if (use_wexproflow) {
+        if (reexec_dictation_via_app_bundle(argv, model_dir) != 0)
+            return 1;
+    }
+#endif
+
     vox_verbose = verbosity;
     vox_verbose_audio = (verbosity >= 2) ? 1 : 0;
 
@@ -552,7 +701,13 @@ int main(int argc, char **argv) {
     /* Load model */
     vox_ctx_t *ctx = vox_load(model_dir);
     if (!ctx) {
-        fprintf(stderr, "Failed to load model from %s\n", model_dir);
+        fprintf(stderr, "Error: Failed to load model from '%s'\n", model_dir);
+        fprintf(stderr, "\nPossible causes:\n");
+        fprintf(stderr, "  - Model directory doesn't exist or is empty\n");
+        fprintf(stderr, "  - Missing required files (consolidated.safetensors, params.json, tekken.json)\n");
+        fprintf(stderr, "\nTo download the model, run:\n");
+        fprintf(stderr, "  ./download_model.sh\n");
+        fprintf(stderr, "\nThen run with: ./voxtral -d voxtral-model -i audio.wav\n");
 #ifdef USE_METAL
         vox_metal_shutdown();
 #endif
@@ -588,6 +743,7 @@ int main(int argc, char **argv) {
 
         vox_menubar_run(wexproflow_main, &args);
 
+        vox_mic_cleanup();
         vox_free(ctx);
 #ifdef USE_METAL
         vox_metal_shutdown();
@@ -830,6 +986,7 @@ int main(int argc, char **argv) {
     }
 
     vox_stream_free(s);
+    vox_mic_cleanup();
     vox_free(ctx);
 #ifdef USE_METAL
     vox_metal_shutdown();

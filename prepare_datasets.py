@@ -17,6 +17,8 @@ Design rules:
 
 import json
 import os
+import shutil
+import subprocess
 import sys
 import warnings
 import random
@@ -83,7 +85,8 @@ def make_dictation_micro(root_dir: str) -> list[dict]:
             if has_say:
                 # macOS text-to-speech → 16kHz mono WAV
                 tmp = wav_path.replace(".wav", "_raw.aiff")
-                os.system(f'say -o "{tmp}" "{text}" 2>/dev/null')
+                subprocess.run(["say", "-o", tmp, text],
+                               capture_output=True, check=False)
                 if os.path.exists(tmp):
                     audio, sr = librosa.load(tmp, sr=16000, mono=True)
                     sf.write(wav_path, audio, 16000)
@@ -115,8 +118,7 @@ def make_dictation_micro(root_dir: str) -> list[dict]:
 
 def _check_say_available() -> bool:
     try:
-        result = os.popen("which say").read().strip()
-        return bool(result)
+        return shutil.which("say") is not None
     except Exception:
         return False
 

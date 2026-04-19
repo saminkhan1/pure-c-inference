@@ -1249,6 +1249,13 @@ int vox_stream_feed(vox_stream_t *s, const float *samples, int n_samples) {
 int vox_stream_finish(vox_stream_t *s) {
     if (!s || s->finished) return -1;
 
+    /* In continuous mode, clear adapter to prevent duplication when restart
+     * re-processes encoder output from flushed right-padding. Without this, the
+     * right-padding could generate new adapter tokens that regenerate text. */
+    if (s->continuous) {
+        s->total_adapter = s->adapter_pos_offset;
+    }
+
     /* Flush with right padding (shared with vox_stream_flush) */
     vox_stream_flush(s);
 

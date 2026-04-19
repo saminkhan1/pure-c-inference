@@ -37,7 +37,7 @@ done
 # The eval infrastructure is frozen. The agent must NOT modify these files.
 # Changes here would let the agent game composite_score without improving voxtral.
 FROZEN_FILES="$EVAL prepare_datasets.py autoresearch.sh"
-DIRTY=$(git diff --name-only -- $FROZEN_FILES 2>/dev/null || true)
+DIRTY=$(git diff HEAD --name-only -- $FROZEN_FILES 2>/dev/null || true)
 if [ -n "$DIRTY" ]; then
     echo "ERROR: frozen eval infrastructure modified. Revert before benchmarking."
     echo "Modified files: $DIRTY"

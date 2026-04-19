@@ -38,12 +38,22 @@ ffmpeg -i samples/I_have_a_dream.ogg -f s16le -ar 16000 -ac 1 - | ./voxtral -d v
 ./download_model.sh
 
 # Python reference implementation (self-contained, no mistral_common needed)
-./pyenv312/bin/python python_simple_implementation.py voxtral-model test_speech.wav
+./venv/bin/python python_simple_implementation.py voxtral-model test_speech.wav
 
 # Create .app bundle for macOS distribution
 make wexproflow && make app
 make install-beta MODEL_DIR=/path/to/voxtral-model
 make dmg   # Create distributable .dmg
+
+# Install as launchd agent (auto-start on login, macOS only)
+make install MODEL_DIR=/path/to/voxtral-model
+make uninstall
+
+# Eval / Benchmark
+./autoresearch.sh                          # Full WER+latency eval (~15 min), outputs composite score
+./autoresearch.sh --set-baseline           # Run eval and save score as baseline for future comparisons
+./venv/bin/python eval_harness.py --help   # Eval harness with per-file WER/latency breakdown
+./venv/bin/python benchmark.py             # Fast benchmark on representative audio subset
 ```
 
 ## Streaming Architecture
@@ -104,7 +114,7 @@ Requires macOS permissions:
 
 `--json-metrics` outputs timing data for programmatic use:
 ```
-JSON_METRICS: {"time_to_first_token_ms": 123.45, "time_to_final_ms": 678.90}
+JSON_METRICS: {"time_to_first_token_ms": 123.45, "time_to_final_ms": 678.90, "encoder_ms": 200.0, "decoder_ms": 400.0, "n_restarts": 0}
 ```
 
 ## Architecture

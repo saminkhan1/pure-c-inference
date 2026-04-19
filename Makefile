@@ -11,6 +11,15 @@ LDFLAGS = -lm
 UNAME_S := $(shell uname -s)
 UNAME_M := $(shell uname -m)
 
+# Pre-build dependency check
+check-deps:
+	@if ! command -v $(CC) >/dev/null 2>&1; then \
+		echo "Error: $(CC) not found. Install Xcode Command Line Tools:"; \
+		echo "  xcode-select --install"; \
+		exit 1; \
+	fi
+	@echo "Dependencies OK"
+
 # Source files
 SRCS = voxtral.c voxtral_kernels.c voxtral_audio.c voxtral_encoder.c voxtral_decoder.c voxtral_tokenizer.c voxtral_safetensors.c
 OBJS = $(SRCS:.c=.o)
@@ -62,7 +71,7 @@ blas: CFLAGS = $(CFLAGS_BASE) -DUSE_BLAS -DUSE_OPENBLAS -I/usr/include/openblas
 blas: LDFLAGS += -lopenblas
 SRCS += voxtral_mic_macos.c
 endif
-blas: clean $(TARGET)
+blas: check-deps clean $(TARGET)
 	@echo ""
 	@echo "Built with BLAS backend"
 
@@ -75,7 +84,7 @@ MPS_CFLAGS = $(CFLAGS_BASE) -DUSE_BLAS -DUSE_METAL -DACCELERATE_NEW_LAPACK
 MPS_OBJCFLAGS = $(MPS_CFLAGS) -fobjc-arc
 MPS_LDFLAGS = $(LDFLAGS) -framework Accelerate -framework Metal -framework MetalPerformanceShaders -framework MetalPerformanceShadersGraph -framework Foundation -framework AudioToolbox -framework CoreFoundation
 
-mps: clean mps-build
+mps: check-deps clean mps-build
 	@echo ""
 	@echo "Built with MPS backend (Metal GPU acceleration)"
 
@@ -101,9 +110,10 @@ WEXPROFLOW_OBJCFLAGS = $(WEXPROFLOW_CFLAGS) -fobjc-arc
 WEXPROFLOW_LDFLAGS = -framework CoreGraphics -framework ApplicationServices \
                      -framework AppKit -framework Foundation
 
-wexproflow: clean wexproflow-build
+wexproflow: check-deps clean wexproflow-build app
 	@echo ""
 	@echo "Built with MPS backend + dictation mode (Command+R)"
+	@echo "Created Voxtral.app for bundled dictation launch"
 
 main.wexproflow.o: main.c voxtral.h voxtral_kernels.h voxtral_mic.h voxtral_hotkey.h voxtral_paste.h voxtral_menubar.h voxtral_sound.h
 	$(CC) $(WEXPROFLOW_CFLAGS) -c -o $@ $<
@@ -154,16 +164,20 @@ INSTALL_BIN  = /usr/local/bin/voxtral
 PLIST_NAME   = com.voxtral.agent
 PLIST_DEST   = $(HOME)/Library/LaunchAgents/$(PLIST_NAME).plist
 
-install: $(TARGET)
+install: wexproflow
 	@[ -n "$(MODEL_DIR)" ] || (echo "Error: specify MODEL_DIR, e.g. make install MODEL_DIR=/path/to/voxtral-model" && exit 1)
 	@plutil -lint $(PLIST_NAME).plist || (echo "Error: plist validation failed" && exit 1)
 	install -m 555 $(TARGET) $(INSTALL_BIN)
-	sed -e "s|__VOXTRAL_BIN__|$(INSTALL_BIN)|g" \
+	-launchctl bootout gui/$$(id -u)/$(PLIST_NAME) 2>/dev/null || true
+	-rm -rf $(APP_INSTALL)
+	cp -r $(APP_BUNDLE) /Applications/
+	xattr -rd com.apple.quarantine $(APP_INSTALL) 2>/dev/null || true
+	sed -e "s|__VOXTRAL_BIN__|$(APP_INSTALL)/Contents/MacOS/$(TARGET)|g" \
 	    -e "s|__MODEL_DIR__|$(MODEL_DIR)|g" \
 	    -e "s|__HOME__|$(HOME)|g" \
 	    $(PLIST_NAME).plist > $(PLIST_DEST)
 	launchctl bootstrap gui/$$(id -u) $(PLIST_DEST)
-	@echo "Installed. voxtral will start on login and run in the menu bar."
+	@echo "Installed. Voxtral.app will start on login and run in the menu bar."
 
 uninstall:
 	-launchctl bootout gui/$$(id -u)/$(PLIST_NAME) 2>/dev/null || true
@@ -226,7 +240,7 @@ app:
 # Install to /Applications + register launchd agent.
 # No Apple Developer ID required.
 # Usage: make install-beta MODEL_DIR=/path/to/voxtral-model
-install-beta: app
+install-beta: wexproflow
 	@[ -n "$(MODEL_DIR)" ] || (echo "Error: specify MODEL_DIR, e.g. make install-beta MODEL_DIR=$$HOME/voxtral-model" && exit 1)
 	@plutil -lint $(PLIST_NAME).plist || (echo "Error: plist validation failed" && exit 1)
 	# Remove existing installation gracefully

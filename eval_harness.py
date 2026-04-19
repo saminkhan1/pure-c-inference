@@ -21,10 +21,10 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from dataclasses import dataclass, asdict, field
+import datetime
+from dataclasses import dataclass, asdict
 import jiwer
 import string
-import statistics
 
 JSON_RE = re.compile(r"JSON_METRICS:\s+(.+)")
 AUDIO_RE = re.compile(r"Audio:\s+\d+\s+samples\s+\(([0-9.]+)\s+seconds\)")
@@ -340,6 +340,9 @@ def main():
     except ValueError:
         print("Invalid --delays format.", file=sys.stderr)
         return 1
+    if not delays:
+        print("--delays produced empty list, expected comma-separated integers.", file=sys.stderr)
+        return 1
 
     commit_sha = get_commit_sha()
     hardware = get_hardware()
@@ -456,7 +459,7 @@ def main():
     print("\n\n=== SCOREBOARD ===")
     print(f"commit={commit_sha}  hardware={hardware}\n")
 
-    composite_score = compute_composite_score([r for r in results if r.success])
+    composite_score = compute_composite_score(results)
     print(f"  COMPOSITE SCORE: {composite_score:.4f}  (promote if > baseline)\n")
 
     # Machine-readable METRIC line — grep-able by autoresearch.sh and agents
@@ -550,7 +553,6 @@ def main():
 
     # Append summary to persistent history — survives context resets and overwritten JSON outputs
     # One JSON line per run; load with: for line in open('bench/autoresearch_history.jsonl'): json.loads(line)
-    import datetime
 
     history_path = out_path.parent / "autoresearch_history.jsonl"
     history_entry = {

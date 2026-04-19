@@ -12,6 +12,9 @@ Audio processing uses a chunked encoder with overlapping windows, bounding memor
 
 ```bash
 # Build (choose your backend)
+#  - mps: Apple Silicon Metal GPU (fastest, recommended)
+#  - wexproflow: mps + Command+R dictation mode
+#  - blas: Intel Mac or Linux with OpenBLAS/Accelerate
 make mps           # Apple Silicon (fastest)
 make wexproflow    # Apple Silicon + Command+R dictation mode
 # or: make blas    # Intel Mac / Linux with OpenBLAS
@@ -35,6 +38,11 @@ ffmpeg -i audio.mp3 -f s16le -ar 16000 -ac 1 - 2>/dev/null | \
 ```
 
 That's it. No Python runtime, no CUDA toolkit, no `mistral_common` or vLLM required at inference time.
+
+### Prerequisites
+
+- **macOS**: Xcode Command Line Tools (`xcode-select --install`)
+- **Linux**: OpenBLAS development files (`libopenblas-dev` on Debian/Ubuntu)
 
 ### Python Reference Implementation
 
@@ -216,7 +224,7 @@ Dictation mode turns voxtral into a system-wide background transcription service
 # 1. Download model weights (~8.9GB)
 ./download_model.sh
 
-# 2. Build with dictation support
+# 2. Build with dictation support (also creates Voxtral.app)
 make wexproflow
 
 # 3. Grant permissions when prompted (one-time):
@@ -230,7 +238,7 @@ make wexproflow
 make install MODEL_DIR=$(pwd)/voxtral-model
 ```
 
-Once running, the voxtral icon appears in the menu bar. Press **Command+R** to begin recording (icon fills in, you hear a soft click), then speak. After ~2 seconds of silence the recording stops (another click), and the text is injected into the focused app. Press **Escape** mid-recording to cancel without pasting.
+Once running, the voxtral icon appears in the menu bar. Press **Command+R** to begin recording (icon fills in, you hear a soft click), then speak. After ~2 seconds of silence the recording stops (another click), and the text is injected into the focused app. Press **Escape** mid-recording to cancel without pasting. If you start dictation from the bare `./voxtral` binary, voxtral now relaunches itself from `Voxtral.app` automatically so AppKit can initialize correctly.
 
 #### Permissions
 
