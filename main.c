@@ -522,7 +522,7 @@ static void *wexproflow_main(void *arg) {
 
 static void usage(const char *prog) {
     fprintf(stderr, "voxtral v" VOXTRAL_VERSION " — Voxtral Realtime 4B speech-to-text\n\n");
-    fprintf(stderr, "Usage: %s -d <model_dir> (-i <input.wav> | --stdin | --from-mic) [options]\n\n", prog);
+    fprintf(stderr, "Usage: %s -d <model_dir> (-i <input.wav> | --stdin | --from-mic | --dictate) [options]\n\n", prog);
     fprintf(stderr, "Required:\n");
     fprintf(stderr, "  -d <dir>      Model directory (with consolidated.safetensors, tekken.json)\n");
     fprintf(stderr, "  -i <file>     Input WAV file (16-bit PCM, any sample rate)\n");
@@ -530,7 +530,7 @@ static void usage(const char *prog) {
     fprintf(stderr, "  --from-mic    Capture from default microphone (macOS only, Ctrl+C to stop)\n");
     fprintf(stderr, "  --dictate     Hotkey dictation: Command+R to record, auto-paste on silence\n");
     fprintf(stderr, "\nOptions:\n");
-    fprintf(stderr, "  -I <secs>     Encoder processing interval in seconds (default: 2.0)\n");
+    fprintf(stderr, "  -I <secs>     Encoder processing interval in seconds (CLI default: 0.5)\n");
     fprintf(stderr, "  --alt <c>     Show alternative tokens within cutoff distance (0.0-1.0)\n");
     fprintf(stderr, "  --monitor     Show non-intrusive symbols inline with output (stderr)\n");
     fprintf(stderr, "  --debug       Debug output (per-layer, per-chunk details)\n");
@@ -766,7 +766,8 @@ int main(int argc, char **argv) {
         if (feed_chunk < 160) feed_chunk = 160;
         if (feed_chunk > DEFAULT_FEED_CHUNK) feed_chunk = DEFAULT_FEED_CHUNK;
     } else {
-        /* Default: use lower interval for live sources (mic/stdin) */
+        /* CLI default: 0.5s unless -I is set. For offline files this mostly
+         * affects batching, since all audio is already available. */
         vox_set_processing_interval(s, 0.5f);
     }
 

@@ -1,9 +1,17 @@
 voxtral_shaders_source.h
 voxtral
+inspect_weights
 voxtral-model/
 pyenv*/
 misc/
 *.o
+*.mps.o
+*.wexproflow.o
+Voxtral.app/
+Voxtral-*.dmg
+_dmg_staging/
+test_speech.wav
+AGENTS.md
 
 # Python
 venv/
