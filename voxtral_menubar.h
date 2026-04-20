@@ -16,6 +16,7 @@ void vox_menubar_set_recording(int active);
 void vox_menubar_set_processing(void);
 void vox_menubar_set_status(const char *msg);
 void vox_menubar_quit(void);
+int  vox_menubar_should_quit(void);
 int  vox_menubar_wait_for_quit(void);
 
 /* Show a warning icon + message when a permission is denied.

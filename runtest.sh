@@ -101,8 +101,13 @@ if [ -x "./test_mic_cycle" ]; then
         echo "PASS: mic start/stop cycle"
         PASS=$((PASS + 1))
     else
-        echo "FAIL: mic start/stop cycle"
-        FAIL=$((FAIL + 1))
+        rc=$?
+        if [ "$rc" -eq 77 ]; then
+            echo "SKIP: mic start/stop cycle (microphone access unavailable)"
+        else
+            echo "FAIL: mic start/stop cycle"
+            FAIL=$((FAIL + 1))
+        fi
     fi
 else
     echo "SKIP: test_mic_cycle not built (run 'make test-mic' first)"

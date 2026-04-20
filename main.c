@@ -55,6 +55,11 @@ static double now_ms(void) {
     return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
 
+static void json_metrics_mark_start(void) {
+    if (json_metrics && json_time_start_ms <= 0)
+        json_time_start_ms = now_ms();
+}
+
 /* SIGINT handler for clean exit.
  * Uses volatile sig_atomic_t for safe cross-thread/signa communication. */
 volatile sig_atomic_t mic_interrupted = 0;
@@ -222,6 +227,31 @@ struct wf_args {
 
 #define WF_TEXT_BUF_CAP 8192
 
+static int wf_should_stop(void) {
+    return mic_interrupted || vox_menubar_should_quit();
+}
+
+static int wf_wait_for_event(void) {
+    int ev = 0;
+
+    pthread_mutex_lock(&wf_mutex);
+    while (wf_event == 0 && !wf_should_stop()) {
+        struct timespec ts;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        ts.tv_nsec += 100 * 1000 * 1000; /* 100ms poll to observe app quit */
+        if (ts.tv_nsec >= 1000000000L) {
+            ts.tv_sec += 1;
+            ts.tv_nsec -= 1000000000L;
+        }
+        pthread_cond_timedwait(&wf_cond, &wf_mutex, &ts);
+    }
+    ev = wf_event;
+    wf_event = 0;
+    pthread_mutex_unlock(&wf_mutex);
+
+    return ev;
+}
+
 static void wf_stop_mic_and_drain(vox_stream_t *stream) {
     float mic_buf[4800];
     int n;
@@ -308,7 +338,7 @@ static void *wexproflow_main(void *arg) {
     if (!vox_paste_check_access()) {
         vox_menubar_set_error("Grant Accessibility access:\nSystem Settings → Privacy & Security → Accessibility");
         /* Stay alive so the menu bar remains visible with the error. */
-        while (!mic_interrupted)
+        while (!wf_should_stop())
             usleep(500000);
         vox_menubar_quit();
         return NULL;
@@ -317,7 +347,7 @@ static void *wexproflow_main(void *arg) {
     /* Start the global hotkey listener (requires Input Monitoring). */
     if (vox_hotkey_start(wexproflow_hotkey_cb) != 0) {
         vox_menubar_set_error("Grant Input Monitoring access:\nSystem Settings → Privacy & Security → Input Monitoring");
-        while (!mic_interrupted)
+        while (!wf_should_stop())
             usleep(500000);
         vox_menubar_quit();
         return NULL;
@@ -339,17 +369,12 @@ static void *wexproflow_main(void *arg) {
     char wf_text_buf[WF_TEXT_BUF_CAP];
     int  wf_text_len = 0;
 
-    while (!mic_interrupted) {
+    while (!wf_should_stop()) {
         if (wf_state == WF_IDLE) {
             /* Block until hotkey event or interrupt */
-            pthread_mutex_lock(&wf_mutex);
-            while (wf_event == 0 && !mic_interrupted)
-                pthread_cond_wait(&wf_cond, &wf_mutex);
-            int ev = wf_event;
-            wf_event = 0;
-            pthread_mutex_unlock(&wf_mutex);
+            int ev = wf_wait_for_event();
 
-            if (mic_interrupted) break;
+            if (wf_should_stop()) break;
             if (ev != 1) continue; /* ignore cancel when idle */
 
             if (vox_mic_start() != 0) {
@@ -451,6 +476,8 @@ static void *wexproflow_main(void *arg) {
             usleep(10000); /* 10ms idle */
             continue;
         }
+
+        json_metrics_mark_start();
 
         /* Silence detection in 10ms windows */
         int off = 0;
@@ -611,6 +638,8 @@ static int feed_chunk = DEFAULT_FEED_CHUNK;
 
 static void feed_and_drain(vox_stream_t *s, const float *samples, int n_samples) {
     int off = 0;
+    if (n_samples > 0)
+        json_metrics_mark_start();
     while (off < n_samples) {
         int chunk = n_samples - off;
         if (chunk > feed_chunk) chunk = feed_chunk;
@@ -741,14 +770,15 @@ int main(int argc, char **argv) {
         args.interval         = (interval > 0) ? interval : 0.5f;  /* dictation: low latency */
         args.sound_enabled    = 1;
 
-        vox_menubar_run(wexproflow_main, &args);
+        int menubar_rc = vox_menubar_run(wexproflow_main, &args);
 
         vox_mic_cleanup();
+        pid_lock_release();
         vox_free(ctx);
 #ifdef USE_METAL
         vox_metal_shutdown();
 #endif
-        return 0;
+        return menubar_rc == 0 ? 0 : 1;
 #endif /* WEXPROFLOW */
     }
 
@@ -822,6 +852,8 @@ int main(int argc, char **argv) {
                 usleep(10000); /* 10ms idle sleep */
                 continue;
             }
+
+            json_metrics_mark_start();
 
             /* Process in 10ms windows for silence cancellation */
             int off = 0;
@@ -929,6 +961,7 @@ int main(int argc, char **argv) {
             size_t count = pcm_frames > 2048 ? 2048 : pcm_frames;
             for (size_t i = 0; i < count; i++)
                 fbuf[i] = src[i] / 32768.0f;
+            json_metrics_mark_start();
             vox_stream_feed(s, fbuf, (int)count);
             drain_tokens(s);
         }
@@ -942,6 +975,7 @@ int main(int argc, char **argv) {
             size_t count = nread > 4096 ? 4096 : nread;
             for (size_t i = 0; i < count; i++)
                 fbuf[i] = raw_buf[i] / 32768.0f;
+            json_metrics_mark_start();
             vox_stream_feed(s, fbuf, (int)count);
             drain_tokens(s);
         }
@@ -959,7 +993,6 @@ int main(int argc, char **argv) {
             fprintf(stderr, "Audio: %d samples (%.1f seconds)\n",
                     n_samples, (float)n_samples / VOX_SAMPLE_RATE);
 
-        if (json_metrics) json_time_start_ms = now_ms();
         feed_and_drain(s, samples, n_samples);
         free(samples);
     }

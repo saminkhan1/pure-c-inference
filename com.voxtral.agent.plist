@@ -14,9 +14,12 @@
         <string>__MODEL_DIR__</string>
     </array>
 
-    <!-- Keep alive: launchd restarts on crash or SIGKILL -->
+    <!-- Keep alive after crashes or SIGKILL, but not after a clean Quit -->
     <key>KeepAlive</key>
-    <true/>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
 
     <!-- Start immediately on login -->
     <key>RunAtLoad</key>

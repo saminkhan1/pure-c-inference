@@ -4,7 +4,7 @@ System-wide on-device dictation for Apple Silicon, implemented in pure C.
 
 This repo takes [Mistral AI's Voxtral Realtime 4B model](https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602) and turns it into a real Mac product surface: Metal-accelerated inference, streaming decode, microphone capture, global hotkeys, a menu bar app, and text injection into the focused application. The goal is not just to run the model. The goal is to make realtime dictation feel native on Apple hardware.
 
-The main public path is:
+The main guided beta path is:
 
 ```bash
 make wexproflow
@@ -33,12 +33,12 @@ mic / wav / stdin
   -> paste into focused macOS app
 ```
 
-Verified before this public release on an Apple M4 Max:
+Verified on an Apple M4 Max for this guided beta setup:
 
 - `make wexproflow`
 - `./voxtral --help`
-- `./voxtral -d voxtral-model -i samples/test_speech.wav --silent`
-- `cat samples/test_speech.wav | ./voxtral -d voxtral-model --stdin --silent`
+- `./voxtral -d voxtral-model -i test_speech.wav --silent`
+- `cat test_speech.wav | ./voxtral -d voxtral-model --stdin --silent`
 - `make test`
 - `python3 benchmark.py`
 - `plutil -lint Info.plist com.voxtral.agent.plist Voxtral.app/Contents/Info.plist`
@@ -58,6 +58,8 @@ make wexproflow
 ```
 
 `make wexproflow` builds the Apple Silicon dictation target, creates `Voxtral.app`, and ad-hoc signs it locally. If you start dictation from `./voxtral`, the binary relaunches itself through `Voxtral.app` automatically so the menu bar app and global hotkey work correctly.
+
+For beta sharing via DMG, the artifact now includes a self-contained `Install Voxtral.command` helper that copies the app, strips quarantine, writes the launch agent, and starts dictation mode without requiring a source checkout.
 
 ## Dictation Flow
 
@@ -93,17 +95,17 @@ Fresh `python3 benchmark.py` run on an Apple M4 Max. These numbers matter becaus
 | Avg time to final | 17479.04 ms |
 | Overall RTF | 0.6135 |
 
-This is the benchmark summary from the public repo as shipped, not a hand-picked one-off trace. See [SPEED.md](SPEED.md) for deeper performance history and notes.
+This is the benchmark summary from the repo in its current guided-beta state, not a hand-picked one-off trace. See [SPEED.md](SPEED.md) for deeper performance history and notes.
 
-## Release Smoke-Tested
+## Guided Beta Smoke-Tested
 
-These commands were rerun on an Apple M4 Max before making the repo public:
+These commands were rerun on an Apple M4 Max before publishing this guided beta configuration:
 
 ```bash
 make wexproflow
 ./voxtral --help
-./voxtral -d voxtral-model -i samples/test_speech.wav --silent
-cat samples/test_speech.wav | ./voxtral -d voxtral-model --stdin --silent
+./voxtral -d voxtral-model -i test_speech.wav --silent
+cat test_speech.wav | ./voxtral -d voxtral-model --stdin --silent
 make test
 python3 benchmark.py
 plutil -lint Info.plist com.voxtral.agent.plist Voxtral.app/Contents/Info.plist
@@ -115,13 +117,13 @@ codesign --verify --deep --strict --verbose=2 Voxtral.app
 Offline file transcription:
 
 ```bash
-./voxtral -d voxtral-model -i samples/test_speech.wav --silent
+./voxtral -d voxtral-model -i test_speech.wav --silent
 ```
 
 Stdin input (WAV auto-detected, or raw `s16le` 16 kHz mono):
 
 ```bash
-cat samples/test_speech.wav | ./voxtral -d voxtral-model --stdin --silent
+cat test_speech.wav | ./voxtral -d voxtral-model --stdin --silent
 ```
 
 Live microphone input:
@@ -142,7 +144,7 @@ Useful flags:
 The repo is Apple-first, but there are still secondary build paths:
 
 ```bash
-make wexproflow    # Apple Silicon dictation build, creates Voxtral.app
+make wexproflow    # Apple Silicon dictation build, creates ad-hoc Voxtral.app
 make mps           # Apple Silicon Metal transcription build
 make blas          # CPU fallback via Accelerate/OpenBLAS
 make test          # regression suite
@@ -150,7 +152,7 @@ make inspect       # safetensors inspector
 make clean
 ```
 
-The public MVP is centered on `make wexproflow` and `--dictate`. `make blas`, `benchmark.py`, `eval_harness.py`, `autoresearch.sh`, and the Python reference implementation are kept in the repo, but they are not the headline product story.
+The current guided beta is centered on `make wexproflow` and `--dictate`. `make blas`, `benchmark.py`, `eval_harness.py`, `autoresearch.sh`, and the Python reference implementation are kept in the repo, but they are not the headline product story.
 
 ## Architecture Notes
 
@@ -166,9 +168,19 @@ For deeper technical details:
 - [SPEED.md](SPEED.md): benchmark history and optimization notes
 - [AUTORESEARCH.md](AUTORESEARCH.md): research/eval framing
 
-## Beta App Note
+## Guided Beta Packaging
 
-`Voxtral.app` is ad-hoc signed, not notarized. That is enough for local use and small beta sharing without an Apple Developer account, but it is not a one-click consumer app yet.
+`Voxtral.app` is ad-hoc signed and not notarized. This repo ships a guided beta install flow, not a Gatekeeper-clean consumer app.
+
+If you run `spctl -a -vv Voxtral.app` on a freshly built or downloaded bundle, rejection is expected. The supported path is the bundled installer, which copies the app into place and removes quarantine.
+
+For beta users receiving the DMG, the supported path is:
+
+1. Open the DMG
+2. Run `Install Voxtral.command`
+3. Enter the model directory when prompted
+
+Source-based installs can still use `make install-beta MODEL_DIR=/path/to/voxtral-model`.
 
 ## Model And License
 

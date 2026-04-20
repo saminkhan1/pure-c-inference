@@ -166,18 +166,26 @@ void vox_mic_stop(void) {
 }
 
 void vox_mic_cleanup(void) {
+    AudioQueueRef q = NULL;
+    int should_stop = 0;
+
     pthread_mutex_lock(&ring_mutex);
-    if (queue) {
-        if (running) {
-            running = 0;
-            pthread_mutex_unlock(&ring_mutex);
-            AudioQueueStop(queue, true);
-            pthread_mutex_lock(&ring_mutex);
-        }
-        AudioQueueDispose(queue, true);
+    q = queue;
+    if (q) {
+        should_stop = running;
+        running = 0;
         queue = NULL;
     }
     pthread_mutex_unlock(&ring_mutex);
+
+    if (!q)
+        return;
+
+    /* AudioQueueStop/Dispose can wait for pending callbacks, so never hold
+     * ring_mutex across them or the callback thread can deadlock on cleanup. */
+    if (should_stop)
+        AudioQueueStop(q, true);
+    AudioQueueDispose(q, true);
 }
 
 

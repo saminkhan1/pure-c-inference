@@ -12,15 +12,25 @@
 #include "voxtral_version.h"
 #import <dispatch/dispatch.h>
 #include <pthread.h>
+#include <stdlib.h>
 #include <string.h>
-
-static dispatch_queue_t g_work_queue;
-static dispatch_semaphore_t g_quit_sem;
 
 /* Protects g_last_text — written from worker thread, read on main thread */
 static pthread_mutex_t g_text_mutex = PTHREAD_MUTEX_INITIALIZER;
 static char g_last_text_buf[8192];
 static int  g_has_last_text = 0;
+
+/* App lifecycle shared by NSApplication and the dictation worker thread. */
+static pthread_mutex_t g_state_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  g_quit_cond = PTHREAD_COND_INITIALIZER;
+static int g_quit_requested = 0;
+static pthread_t g_worker_thread;
+static int g_worker_thread_started = 0;
+
+struct vox_worker_start {
+    vox_worker_fn fn;
+    void *user_data;
+};
 
 @interface VoxtralDelegate : NSObject <NSApplicationDelegate>
 @property (strong) NSStatusItem *statusItem;
@@ -170,23 +180,55 @@ static int  g_has_last_text = 0;
 
 /* ---- Public API ---- */
 
+static void *vox_menubar_worker_main(void *arg) {
+    struct vox_worker_start *start = (struct vox_worker_start *)arg;
+    vox_worker_fn fn = start->fn;
+    void *user_data = start->user_data;
+    free(start);
+
+    @autoreleasepool {
+        fn(user_data);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSApp terminate:nil];
+        });
+    }
+
+    return NULL;
+}
+
 int vox_menubar_run(vox_worker_fn worker_fn, void *user_data) {
     @autoreleasepool {
-        g_quit_sem = dispatch_semaphore_create(0);
-        g_work_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        struct vox_worker_start *start =
+            (struct vox_worker_start *)calloc(1, sizeof(struct vox_worker_start));
+        if (!start) return -1;
+        start->fn = worker_fn;
+        start->user_data = user_data;
+
+        pthread_mutex_lock(&g_state_mutex);
+        g_quit_requested = 0;
+        g_worker_thread_started = 0;
+        pthread_mutex_unlock(&g_state_mutex);
 
         [NSApplication sharedApplication];
         [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
         [NSApp setDelegate:[[VoxtralDelegate alloc] init]];
 
-        dispatch_async(g_work_queue, ^{
-            worker_fn(user_data);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [NSApp terminate:nil];
-            });
-        });
+        if (pthread_create(&g_worker_thread, NULL, vox_menubar_worker_main, start) != 0) {
+            free(start);
+            return -1;
+        }
+
+        pthread_mutex_lock(&g_state_mutex);
+        g_worker_thread_started = 1;
+        pthread_mutex_unlock(&g_state_mutex);
 
         [NSApp run];
+
+        pthread_join(g_worker_thread, NULL);
+
+        pthread_mutex_lock(&g_state_mutex);
+        g_worker_thread_started = 0;
+        pthread_mutex_unlock(&g_state_mutex);
     }
     return 0;
 }
@@ -262,25 +304,48 @@ void vox_menubar_set_last_text(const char *text) {
 }
 
 void vox_menubar_quit(void) {
-    dispatch_semaphore_signal(g_quit_sem);
+    pthread_mutex_lock(&g_state_mutex);
+    g_quit_requested = 1;
+    pthread_cond_broadcast(&g_quit_cond);
+    pthread_mutex_unlock(&g_state_mutex);
+
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSApp terminate:nil];
     });
 }
 
+int vox_menubar_should_quit(void) {
+    int quit_requested;
+
+    pthread_mutex_lock(&g_state_mutex);
+    quit_requested = g_quit_requested;
+    pthread_mutex_unlock(&g_state_mutex);
+
+    return quit_requested;
+}
+
 int vox_menubar_wait_for_quit(void) {
-    return dispatch_semaphore_wait(g_quit_sem, DISPATCH_TIME_FOREVER);
+    pthread_mutex_lock(&g_state_mutex);
+    while (!g_quit_requested)
+        pthread_cond_wait(&g_quit_cond, &g_state_mutex);
+    pthread_mutex_unlock(&g_state_mutex);
+    return 0;
 }
 
 #else /* non-Apple stubs */
 
 #include "voxtral_menubar.h"
+#include <pthread.h>
 #include <stdio.h>
 
-static dispatch_semaphore_t g_quit_sem;
+static pthread_mutex_t g_state_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t g_quit_cond = PTHREAD_COND_INITIALIZER;
+static int g_quit_requested = 0;
 
 int vox_menubar_run(vox_worker_fn worker_fn, void *user_data) {
-    g_quit_sem = dispatch_semaphore_create(0);
+    pthread_mutex_lock(&g_state_mutex);
+    g_quit_requested = 0;
+    pthread_mutex_unlock(&g_state_mutex);
     worker_fn(user_data);
     return 0;
 }
@@ -288,7 +353,25 @@ int vox_menubar_run(vox_worker_fn worker_fn, void *user_data) {
 void vox_menubar_set_recording(int active)        { (void)active; }
 void vox_menubar_set_error(const char *msg)       { if (msg) fprintf(stderr, "Error: %s\n", msg); }
 void vox_menubar_set_last_text(const char *text)  { (void)text; }
-void vox_menubar_quit(void)                       { dispatch_semaphore_signal(g_quit_sem); }
-int  vox_menubar_wait_for_quit(void)              { return dispatch_semaphore_wait(g_quit_sem, DISPATCH_TIME_FOREVER); }
+void vox_menubar_quit(void) {
+    pthread_mutex_lock(&g_state_mutex);
+    g_quit_requested = 1;
+    pthread_cond_broadcast(&g_quit_cond);
+    pthread_mutex_unlock(&g_state_mutex);
+}
+int  vox_menubar_should_quit(void) {
+    int quit_requested;
+    pthread_mutex_lock(&g_state_mutex);
+    quit_requested = g_quit_requested;
+    pthread_mutex_unlock(&g_state_mutex);
+    return quit_requested;
+}
+int  vox_menubar_wait_for_quit(void) {
+    pthread_mutex_lock(&g_state_mutex);
+    while (!g_quit_requested)
+        pthread_cond_wait(&g_quit_cond, &g_state_mutex);
+    pthread_mutex_unlock(&g_state_mutex);
+    return 0;
+}
 
 #endif
